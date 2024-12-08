@@ -21,7 +21,11 @@ void serverCallback(TCPServer *srv, ClientConnection *src, std::string &msg) {
             if (src->getClientName() != clientMetadata.getProjectName()) {
                 srv->updateClientName(src, clientMetadata.getProjectName());
             }
+
+            globalJSON.setProjectValue(src->getClientName(), "Project Name", clientMetadata.getProjectName());
             globalJSON.setProjectValue(src->getClientName(), "Project Status", clientMetadata.getProjectStatus());
+            globalJSON.setProjectValue(src->getClientName(), "Hardware Model", clientMetadata.getHardwareModel());
+            globalJSON.setProjectValue(src->getClientName(), "Project Uptime", std::to_string(clientMetadata.getProjectRuntime()));
             
             break;
     }

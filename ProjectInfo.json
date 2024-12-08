@@ -1,7 +1,22 @@
 {
     "projects": {
         "SAMPLE PROJECT": {
-            "Project Status": "RUNNING"
+            "Hardware Model": "MS16.0.0",
+            "Project Name": "SAMPLE PROJECT",
+            "Project Status": "RUNNING",
+            "Project Uptime": "0"
+        },
+        "SAMPLE PROJECT (1)": {
+            "Hardware Model": "MS16.0.0",
+            "Project Name": "SAMPLE PROJECT",
+            "Project Status": "RUNNING",
+            "Project Uptime": "0"
+        },
+        "SAMPLE PROJECT (2)": {
+            "Hardware Model": "MS16.0.0",
+            "Project Name": "SAMPLE PROJECT",
+            "Project Status": "RUNNING",
+            "Project Uptime": "0"
         }
     },
     "version": "1.0.0"
