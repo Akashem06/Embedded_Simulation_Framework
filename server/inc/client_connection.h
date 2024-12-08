@@ -2,6 +2,7 @@
 #define CLIENT_CONNECTION_H
 
 #include <string>
+#include <atomic>
 #include <arpa/inet.h>
 #include <pthread.h>
 
@@ -10,21 +11,32 @@ class TCPServer;
 
 class ClientConnection {
     private:
-        bool isConnected;
-        int connSocket;
-        struct sockaddr_in clientAddress;
-        pthread_t monitorThread;
+        std::atomic<bool> m_isConnected;
+        int m_clientPort;
+        int m_clientSocket;
+        struct sockaddr_in m_clientAddress;
+        pthread_t m_monitorThreadId;
+        std::string m_clientName;
 
         TCPServer *server;
+
+        std::string getClientAddress() const;
     public:
         ClientConnection(TCPServer *server);
         ~ClientConnection();
 
-        bool acceptServer(int listeningSocket);
-        void send(const std::string &msg);
+        bool acceptClient(int listeningSocket);
 
         void monitorThreadProcedure();
         void sendMessage(const std::string &msg);
+        
+        std::string getClientName() const;
+        void setClientName(const std::string& name);
+
+        int getClientPort() const;
+        void setClientPort(int port);
+
+        bool isConnected();
 };
 
 #endif

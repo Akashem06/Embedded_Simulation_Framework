@@ -4,9 +4,15 @@
 #include "client_connection.h"
 #include "tcp_server.h"
 
+std::string ClientConnection::getClientAddress() const {
+    char ip_str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(m_clientAddress.sin_addr), ip_str, INET_ADDRSTRLEN);
+    return std::string(ip_str);
+}
+
 ClientConnection::ClientConnection(TCPServer *server) {
     this->server = server;
-    isConnected = false;
+    m_isConnected = false;
 }
 
 ClientConnection::~ClientConnection() {
@@ -18,58 +24,99 @@ void ClientConnection::monitorThreadProcedure() {
     char buffer[bufferSize + 1];
     int n;
 
-    isConnected = true;
+    m_isConnected = true;
     while (true) {
-        n = read(connSocket, &buffer, bufferSize);
+        n = read(m_clientSocket, &buffer, bufferSize);
         if (n <= 0) {
             break;
         }
+
+        buffer[n] = '\0';
 
         std::string msg(buffer, n);
         server->messageReceived(this, msg);
     }
 
-    close(connSocket);
-    isConnected = false;
+    close(m_clientSocket);
+    m_isConnected = false;
+    
+    server->removeClient(this);
 }
 
-void *clientConnection_MonitorThreadProcedure(void *param) {
+void *monitorThreadWrapper(void *param) {
     ClientConnection *conn = static_cast<ClientConnection *> (param);
 
     try {
         conn->monitorThreadProcedure();
+    } catch (const std::exception &e) {
+        std::cerr << "Error in Monitor Thread Procedure: " << e.what() << std::endl;
     } catch (...) {
-        std::cerr << "Error in MonitorThreadProcedure" << std::endl;
+        std::cerr << "Unknown error in MonitorThreadProcedure" << std::endl;
     }
 
     delete conn;
     return nullptr;
 }
 
-bool ClientConnection::acceptServer(int listeningSocket) {
-    socklen_t clientLength = sizeof(clientAddress);
-    connSocket = accept(listeningSocket, (struct sockaddr *) &clientAddress, &clientLength);
+bool ClientConnection::acceptClient(int listeningSocket) {
+    socklen_t clientLength = sizeof(m_clientAddress);
+    m_clientSocket = accept(listeningSocket, (struct sockaddr *) &m_clientAddress, &clientLength);
     
-    if (connSocket < 0) 
+    if (m_clientSocket < 0) {
+        std::cerr << "Failed to accept client connection" << std::endl;
         return false;
-
-    if (pthread_create(&monitorThread, nullptr, clientConnection_MonitorThreadProcedure, this) < 0) {
-        throw "Error creating monitor thread";
     }
 
-    if (pthread_detach(monitorThread) != 0) {
-        throw "Error detatching monitor-thread";
+    try {
+        if (m_clientName.empty()) {
+            m_clientName = getClientAddress();
+        }
+
+        if (pthread_create(&m_monitorThreadId, nullptr, monitorThreadWrapper, this) < 0) {
+            throw std::runtime_error("Error creating monitor thread");
+        }
+
+        if (pthread_detach(m_monitorThreadId) != 0) {
+            throw std::runtime_error("Error detatching monitor-thread");
+        }
+
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        close(m_clientSocket);
+        return false;
     }
 
+    m_isConnected = true;
     return true;
 }
 
 void ClientConnection::sendMessage(const std::string &msg) {
-    if (!isConnected)
-        throw "Sending on unconnected socket";
+    if (!m_isConnected) {
+        throw std::runtime_error("Attempting to send on unconnected socket");
+    }
     
-    size_t n = write(connSocket, &msg[0], msg.size());
+    size_t bytesSent = write(m_clientSocket, msg.c_str(), msg.length());
+    if (bytesSent < 0 || bytesSent != msg.length()) {
+        throw std::runtime_error("Failed to send complete message");
+    }
+}
 
-    if (n < msg.size())
-        throw "Error sending message";
+std::string ClientConnection::getClientName() const {
+    return m_clientName;
+}
+
+void ClientConnection::setClientName(const std::string& name) {
+    m_clientName = name;
+}
+
+int ClientConnection::getClientPort() const {
+    return m_clientPort;
+}
+
+void ClientConnection::setClientPort(int port) {
+    m_clientPort = port;
+}
+
+bool ClientConnection::isConnected() {
+    return m_isConnected;
 }

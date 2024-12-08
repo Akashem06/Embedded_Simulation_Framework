@@ -5,63 +5,59 @@
 
 TCPServer::TCPServer()
 {
-    isListening = false;
-    listenPort = -1;
-    pthread_mutex_init(&mutex, nullptr);
+    m_isListening = false;
+    m_listenPort = -1;
+    pthread_mutex_init(&m_mutex, nullptr);
 }
 
 TCPServer::~TCPServer()
 {
-    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&m_mutex);
 }
 
 void TCPServer::listenThreadProcedure()
 {
-    socketHandle = socket(AF_INET, SOCK_STREAM, 0);
+    m_listeningSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (socketHandle < 0)
+    if (m_listeningSocket < 0)
     {
-        throw "Error creating socket";
+        throw std::runtime_error("Error creating socket for port " + std::to_string(m_listenPort));
     }
 
     int enable = 1;
-    if (setsockopt(socketHandle, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    if (setsockopt(m_listeningSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
     {
         throw "Error setting socket option SO_REUSEADDR";
     }
-    std::cout << "Creating socket";
-    bzero((char *)&serverAddress, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(listenPort);
-    serverAddress.sin_addr.s_addr = INADDR_ANY; /* Listen to all addresses */
+    bzero((char *)&m_serverAddress, sizeof(m_serverAddress));
+    m_serverAddress.sin_family = AF_INET;
+    m_serverAddress.sin_port = htons(m_listenPort);
+    m_serverAddress.sin_addr.s_addr = INADDR_ANY; /* Listen to all addresses */
 
-    if (bind(socketHandle, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
+    if (bind(m_listeningSocket, (struct sockaddr *) &m_serverAddress, sizeof(m_serverAddress)) < 0) {
         throw "Error binding socket";
     }
 
-    listen(socketHandle, 5);
-    isListening = true;
+    listen(m_listeningSocket, 5);
+    m_isListening = true;
 
-    while (isListening) {
+    while (m_isListening) {
         ClientConnection *conn = new ClientConnection(this);
 
-        if (!conn->acceptServer(socketHandle)) {
+        if (!conn->acceptClient(m_listeningSocket)) {
             delete conn;
             break;
         }
 
         std::cerr << "Connection established" << std::endl;
 
-        pthread_mutex_lock(&mutex);
-        /* Add to list of connections */
-        connections.push_back(conn);
-        pthread_mutex_unlock(&mutex);
+        updateClientName(conn, conn->getClientName());
     }
 
-    isListening = false;
+    m_isListening = false;
 }
 
-void *tcpServer_ListenThreadProcedure(void *param)
+void *listenThreadWrapper(void *param)
 {
     TCPServer *server = static_cast<TCPServer *>(param);
 
@@ -77,26 +73,64 @@ void *tcpServer_ListenThreadProcedure(void *param)
     return nullptr;
 }
 
-void TCPServer::listenClients(int port, std::function<void(TCPServer *srv, ClientConnection *src, const std::string&)> callback)
+void TCPServer::listenClients(int port, serverCallback callback)
 {
-    if (isListening)
+    if (m_isListening)
         return;
 
-    this->listenPort = port;
-    this->callback = callback;
+    this->m_listenPort = port;
+    this->m_serverCallback = callback;
 
-    if (pthread_create(&listenThread, nullptr, tcpServer_ListenThreadProcedure, this))
+    if (pthread_create(&m_listenThreadId, nullptr, listenThreadWrapper, this))
     {
         throw "Listen Error";
     }
 }
 
+void TCPServer::removeClient(ClientConnection* conn) {
+    if (conn) {
+        std::cerr << "Removed client: " << conn->getClientName() << std::endl;
+        m_connections.erase(conn->getClientName());
+    }
+}
+
+void TCPServer::updateClientName(ClientConnection *conn, std::string newName) {
+    pthread_mutex_lock(&m_mutex);
+    std::string oldClientName = conn->getClientName();
+
+    if (!oldClientName.empty()) {
+        m_connections.erase(oldClientName);
+    }
+
+    conn->setClientName(newName);
+
+    /* Handle potential client duplicates */
+    std::string clientName = newName;
+    unsigned int clientDuplicateCount = 1U;
+    while (m_connections.count(clientName)) {
+        clientName = newName + " (" + std::to_string(clientDuplicateCount) + ")";
+        clientDuplicateCount++;
+    }
+
+    m_connections[clientName] = conn;
+    conn->setClientName(clientName);
+    pthread_mutex_unlock(&m_mutex);
+}
+
 void TCPServer::messageReceived(ClientConnection *src, std::string &msg) {
-    callback(this, src, msg);
+    m_serverCallback(this, src, msg);
 }
 
 void TCPServer::sendMessage(ClientConnection *dst, const std::string &msg) {
     dst->sendMessage(msg);
+}
+
+void TCPServer::broadcastMessage(const std::string &msg) {
+    for (auto &pair : m_connections) {
+        if (pair.second->isConnected()) {
+            pair.second->sendMessage(msg);
+        }
+    }
 }
 
 void TCPServer::stop()
