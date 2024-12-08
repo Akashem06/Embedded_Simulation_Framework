@@ -96,7 +96,7 @@ void ClientConnection::sendMessage(const std::string &msg) {
     }
     
     size_t bytesSent = write(m_clientSocket, msg.c_str(), msg.length());
-    if (bytesSent < 0 || bytesSent != msg.length()) {
+    if (bytesSent != msg.length()) {
         throw std::runtime_error("Failed to send complete message");
     }
 }

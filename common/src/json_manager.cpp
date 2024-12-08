@@ -61,6 +61,8 @@ nlohmann::json &JSONManager<T>::getProjectJSON(const std::string &projectName) {
     } catch (const std::exception &e) {
         std::cerr << "Error getting project JSON: " << e.what() << std::endl;
     }
+
+    return m_globalJSON;
 }
 
 template <typename T>
@@ -92,6 +94,8 @@ T JSONManager<T>::getProjectValue(const std::string &projectName, const std::str
     } catch (const std::exception &e) {
         std::cerr << "Error getting project value: " << e.what() << std::endl;
     }
+
+    return static_cast<T>(0U);
 }
 
 template class JSONManager<std::string>;
