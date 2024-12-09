@@ -2,8 +2,6 @@
 #define METADATA_H
 
 #include <string>
-#include <chrono>
-#include <ctime>
 
 #define METADATA_HEADER "METADATA"
 
@@ -32,8 +30,8 @@ class Metadata {
         std::string serialize() const;
         void deserialize(std::string &data);
 
-        private:
-            Payload m_metadata;
+    private:
+        Payload m_metadata;
 };
 
 #endif

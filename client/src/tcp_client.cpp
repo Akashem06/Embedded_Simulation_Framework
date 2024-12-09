@@ -1,5 +1,6 @@
-#include <unistd.h>
 #include <iostream>
+#include <cstring>
+
 #include "tcp_client.h"
 
 #define MAX_PACKET_SIZE 256U
@@ -57,7 +58,7 @@ void TCPClient::receiverProcedure() {
 
         if (bytesRead <= 0) {
             disconnectServer();
-            throw "Connection lost";
+            throw std::runtime_error("Connection lost");
         }
 
         message[bytesRead] = '\0';
@@ -99,24 +100,24 @@ void TCPClient::connectServer() {
     m_clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
     if (m_clientSocket < 0)
-        throw "Error created socket";
+        throw std::runtime_error("Error created socket");
     
     m_serverAddress.sin_family = AF_INET;
     m_serverAddress.sin_port = htons(m_port);
 
     if (inet_pton(AF_INET, m_host.c_str(), &m_serverAddress.sin_addr) <= 0) {
         close(m_clientSocket);
-        throw "Error converting IPv4 host address to binary form";
+        throw std::runtime_error("Error converting IPv4 host address to binary form");
     }
 
     if (connect(m_clientSocket, (struct sockaddr *) &m_serverAddress, sizeof(m_serverAddress)) < 0) {
         close(m_clientSocket);
-        throw "Error connecting socket";
+        throw std::runtime_error("Error connecting socket");
     }
 
     if (!waitForSocket(5000, false)) {
         close(m_clientSocket);
-        throw "Connection timeout";
+        throw std::runtime_error("Connection timeout");
     }
 
     m_isRunning = true;
@@ -128,12 +129,12 @@ void TCPClient::connectServer() {
 
     if (pthread_create(&m_receiverThreadId, NULL, receiverThreadProcedure, this)) {
         close(m_clientSocket);
-        throw "Failed to create receiver thread";
+        throw std::runtime_error("Failed to create receiver thread");
     }
 
     if (pthread_create(&m_processMessageThreadId, NULL, processMessagesThread, this)) {
         close(m_clientSocket);
-        throw "Failed to create process messages thread";
+        throw std::runtime_error("Failed to create process messages thread");
     }
 
     std::cout << "Connected :-)" << std::endl;
@@ -147,7 +148,7 @@ void TCPClient::disconnectServer() {
 void TCPClient::sendMessage(const std::string &msg) {
     int n = send(m_clientSocket, msg.c_str(), msg.size(), 0);
     if (n < 0)
-        throw "Error sending message";
+        throw std::runtime_error("Error sending message");
 }
 
 std::string TCPClient::receiveMessage() {
@@ -171,11 +172,11 @@ TCPClient::TCPClient(const std::string &host, int port, messageCallback messageC
     this->m_connectCallback = connectCallback;
 
     if (pthread_mutex_init(&m_mutex, NULL) != 0) {
-        throw "Error initializing mutex";
+        throw std::runtime_error("Error initializing mutex");
     }
 
     if (sem_init(&m_messageSemaphore, 0, 0) != 0) {
-        throw "Error initializing semaphore";
+        throw std::runtime_error("Error initializing semaphore");
     }
 }
 

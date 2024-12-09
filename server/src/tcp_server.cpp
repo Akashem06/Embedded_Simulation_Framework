@@ -1,6 +1,8 @@
 #include <iostream>
 #include <unistd.h>
 #include <string.h>
+#include <cstring>
+
 #include "tcp_server.h"
 
 TCPServer::TCPServer()
@@ -17,25 +19,23 @@ TCPServer::~TCPServer()
 
 void TCPServer::listenThreadProcedure()
 {
-    m_listeningSocket = socket(AF_INET, SOCK_STREAM, 0);
+    m_listeningSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    if (m_listeningSocket < 0)
-    {
+    if (m_listeningSocket < 0) {
         throw std::runtime_error("Error creating socket for port " + std::to_string(m_listenPort));
     }
 
     int enable = 1;
-    if (setsockopt(m_listeningSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-    {
-        throw "Error setting socket option SO_REUSEADDR";
+    if (setsockopt(m_listeningSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+        throw std::runtime_error("Error setting socket option SO_REUSEADDR");
     }
-    bzero((char *)&m_serverAddress, sizeof(m_serverAddress));
+    memset((char *)&m_serverAddress, 0U, sizeof(m_serverAddress));
     m_serverAddress.sin_family = AF_INET;
     m_serverAddress.sin_port = htons(m_listenPort);
     m_serverAddress.sin_addr.s_addr = INADDR_ANY; /* Listen to all addresses */
 
     if (bind(m_listeningSocket, (struct sockaddr *) &m_serverAddress, sizeof(m_serverAddress)) < 0) {
-        throw "Error binding socket";
+        throw std::runtime_error("Error binding socket");
     }
 
     listen(m_listeningSocket, 5);
@@ -78,12 +78,12 @@ void TCPServer::listenClients(int port, serverCallback callback)
     if (m_isListening)
         return;
 
-    this->m_listenPort = port;
-    this->m_serverCallback = callback;
+    m_listenPort = port;
+    m_serverCallback = callback;
 
     if (pthread_create(&m_listenThreadId, nullptr, listenThreadWrapper, this))
     {
-        throw "Listen Error";
+        throw std::runtime_error("Listen Error");
     }
 }
 

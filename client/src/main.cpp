@@ -1,5 +1,6 @@
 #include <iostream>
 #include "tcp_client.h"
+#include "ntp_client.h"
 #include "metadata.h"
 
 std::string messageCallback(TCPClient *client, const std::string &message) {
@@ -23,8 +24,11 @@ int main(int argc, char **argv)
 {
     std::cout << "Running Client" << std::endl;
 
-    TCPClient client("127.0.0.1", 1024, messageCallback, connectCallback);
-    client.connectServer();
+    NTPClient ntpClient;
+    TCPClient serverClient("127.0.0.1", 1024, messageCallback, connectCallback);
+    
+    ntpClient.startSynchronization("127.0.0.1");
+    serverClient.connectServer();
     
     int n;
     std::cin >> n;

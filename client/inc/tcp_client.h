@@ -14,7 +14,6 @@
 #include <poll.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <errno.h>
 
 #define MAX_BUFFER_SIZE 256U
 

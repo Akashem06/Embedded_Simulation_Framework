@@ -4,6 +4,7 @@
 
 #include "tcp_server.h"
 #include "client_connection.h"
+#include "ntp_server.h"
 
 #include "command_code.h"
 #include "metadata.h"
@@ -36,8 +37,11 @@ void serverCallback(TCPServer *srv, ClientConnection *src, std::string &msg) {
 int main(int argc, char **argv)
 {
     std::cout << "Running Server" << std::endl;
-    TCPServer server;
-    server.listenClients(1024, serverCallback);
+    TCPServer tcp_server;
+    NTPServer ntp_server;
+    
+    tcp_server.listenClients(1024, serverCallback);
+    ntp_server.startListening("127.0.0.1", "time.google.com");
 
     int foo;
     std::cin >> foo;

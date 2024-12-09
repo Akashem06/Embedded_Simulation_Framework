@@ -33,17 +33,14 @@ template <typename T>
 JSONManager<T>::JSONManager() {
     m_JSONPath = DEFAULT_JSON_PATH;
     
-    if (!std::filesystem::exists(m_JSONPath)) {
-        /* Initialize global JSON */
-        try {
-            m_globalJSON = {
-                {"version", "1.0.0"},
-                {"projects", nlohmann::json::object()}
-            };
-            saveGlobalJSON();
-        } catch (const std::exception &e) {
-            std::cerr << "Error initializing global JSON: " << e.what() << std::endl;
-        }
+    try {
+        m_globalJSON = {
+            {"version", "1.0.0"},
+            {"projects", nlohmann::json::object()}
+        };
+        saveGlobalJSON();
+    } catch (const std::exception &e) {
+        std::cerr << "Error initializing global JSON: " << e.what() << std::endl;
     }
 }
 
