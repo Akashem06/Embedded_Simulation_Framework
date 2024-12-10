@@ -3,9 +3,25 @@
 
 #include <string>
 
-enum class CommandCode : uint8_t {
-    METADATA,
-    NUM_COMMAND_CODES
+enum class CommandCode {
+  /* MISC Commands */
+  METADATA,
+
+  /* GPIO Commands */
+  GPIO_SET_STATE,
+  GPIO_GET_STATE,
+  GPIO_GET_MODE,
+  GPIO_GET_ALT_FUNCTION,
+
+  /* I2C Commands */
+
+  /* SPI Commands */
+
+  /* UART Commands */
+
+  /* FLASH Commands */
+
+  NUM_COMMAND_CODES
 };
 
 std::string encodeCommand(const CommandCode commandCode, std::string &msg);

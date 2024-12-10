@@ -3,35 +3,35 @@
 
 #include <string>
 
-#define METADATA_HEADER "METADATA"
-
+namespace Datagram {
 class Metadata {
-    public:
-        struct Payload {
-            std::string projectName;
-            std::string projectStatus;
-            std::string hardwareModel;
-            
-            int projectRuntime;
-        };
-        explicit Metadata(Payload &data);
-        Metadata() = default;
+ public:
+  struct Payload {
+    std::string projectName;
+    std::string projectStatus;
+    std::string hardwareModel;
 
-        void setProjectName(const std::string &projectName);
-        void setProjectStatus(const std::string &projectStatus);
-        void setHardwareModel(const std::string &hardwareModel);
-        void setProjectRuntime(const int &projectRuntime);
+    int projectRuntime;
+  };
+  explicit Metadata(Payload &data);
+  Metadata() = default;
 
-        std::string getProjectName() const;
-        std::string getProjectStatus() const;
-        std::string getHardwareModel() const;
-        int getProjectRuntime() const;
+  std::string serialize() const;
+  void deserialize(std::string &metadataPayload);
 
-        std::string serialize() const;
-        void deserialize(std::string &data);
+  void setProjectName(const std::string &projectName);
+  void setProjectStatus(const std::string &projectStatus);
+  void setHardwareModel(const std::string &hardwareModel);
+  void setProjectRuntime(const int &projectRuntime);
 
-    private:
-        Payload m_metadata;
+  std::string getProjectName() const;
+  std::string getProjectStatus() const;
+  std::string getHardwareModel() const;
+  int getProjectRuntime() const;
+
+ private:
+  Payload m_metadata;
 };
 
+}  // namespace Datagram
 #endif
