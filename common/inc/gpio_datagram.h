@@ -1,6 +1,7 @@
 #ifndef GPIO_DATAGRAM_H
 #define GPIO_DATAGRAM_H
 
+#include <cstdint>
 #include <string>
 
 #include "command_code.h"
@@ -20,7 +21,7 @@ class Gpio {
 
   struct Payload {
     Port gpioPort;
-    int gpioPin;
+    uint8_t gpioPin;
   };
 
   explicit Gpio(Payload &data);

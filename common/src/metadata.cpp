@@ -4,30 +4,17 @@
 #include <vector>
 
 #include "command_code.h"
+#include "serialization.h"
 
 namespace Datagram {
 
 std::string Metadata::serialize() const {
   std::string serializedData;
 
-  uint16_t nameLength = m_metadata.projectName.length();
-  serializedData.append(reinterpret_cast<const char *>(&nameLength),
-                        sizeof(nameLength));
-  serializedData.append(m_metadata.projectName);
-
-  uint16_t statusLength = m_metadata.projectStatus.length();
-  serializedData.append(reinterpret_cast<const char *>(&statusLength),
-                        sizeof(statusLength));
-  serializedData.append(m_metadata.projectStatus);
-
-  uint16_t modelLength = m_metadata.hardwareModel.length();
-  serializedData.append(reinterpret_cast<const char *>(&modelLength),
-                        sizeof(modelLength));
-  serializedData.append(m_metadata.hardwareModel);
-
-  uint32_t runtime = static_cast<uint32_t>(m_metadata.projectRuntime);
-  serializedData.append(reinterpret_cast<const char *>(&runtime),
-                        sizeof(runtime));
+  serializeString(serializedData, m_metadata.projectName);
+  serializeString(serializedData, m_metadata.projectStatus);
+  serializeString(serializedData, m_metadata.hardwareModel);
+  serializeInteger<uint32_t>(serializedData, m_metadata.projectRuntime);
 
   return encodeCommand(CommandCode::METADATA, serializedData);
 }
@@ -35,32 +22,10 @@ std::string Metadata::serialize() const {
 void Metadata::deserialize(std::string &metadataPayload) {
   size_t offset = 0;
 
-  uint16_t nameLength;
-  std::memcpy(&nameLength, metadataPayload.data() + offset, sizeof(nameLength));
-  offset += sizeof(nameLength);
-
-  m_metadata.projectName = metadataPayload.substr(offset, nameLength);
-  offset += nameLength;
-
-  uint16_t statusLength;
-  std::memcpy(&statusLength, metadataPayload.data() + offset,
-              sizeof(statusLength));
-  offset += sizeof(statusLength);
-
-  m_metadata.projectStatus = metadataPayload.substr(offset, statusLength);
-  offset += statusLength;
-
-  uint16_t modelLength;
-  std::memcpy(&modelLength, metadataPayload.data() + offset,
-              sizeof(modelLength));
-  offset += sizeof(modelLength);
-
-  m_metadata.hardwareModel = metadataPayload.substr(offset, modelLength);
-  offset += modelLength;
-
-  uint32_t runtime;
-  std::memcpy(&runtime, metadataPayload.data() + offset, sizeof(runtime));
-  m_metadata.projectRuntime = static_cast<int>(runtime);
+  m_metadata.projectName = deserializeString(metadataPayload, offset);
+  m_metadata.projectStatus = deserializeString(metadataPayload, offset);
+  m_metadata.hardwareModel = deserializeString(metadataPayload, offset);
+  m_metadata.projectRuntime = deserializeInteger<uint32_t>(metadataPayload, offset);
 }
 
 Metadata::Metadata(Payload &data) { m_metadata = data; }

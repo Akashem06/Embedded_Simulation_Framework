@@ -1,6 +1,7 @@
 #ifndef METADATA_H
 #define METADATA_H
 
+#include <cstdint>
 #include <string>
 
 namespace Datagram {
@@ -11,7 +12,7 @@ class Metadata {
     std::string projectStatus;
     std::string hardwareModel;
 
-    int projectRuntime;
+    uint32_t projectRuntime;
   };
   explicit Metadata(Payload &data);
   Metadata() = default;
