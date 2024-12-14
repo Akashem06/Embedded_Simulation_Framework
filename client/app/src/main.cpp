@@ -26,8 +26,7 @@ void connectCallback(TCPClient *client) {
 int main(int argc, char **argv) {
   std::cout << "Running Client" << std::endl;
 
-  TCPClient serverClient("127.0.0.1", 1024, applicationMessageCallback,
-                         connectCallback);
+  TCPClient serverClient("127.0.0.1", 1024, applicationMessageCallback, connectCallback);
   serverClient.connectServer();
 
 #if USE_NETWORK_TIME_PROTOCOL == 1U

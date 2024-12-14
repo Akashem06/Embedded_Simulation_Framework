@@ -10,8 +10,7 @@ class Terminal {
 
   std::string toLower(const std::string &input);
 
-  void handleGpioCommands(const std::string &action,
-                          std::vector<std::string> &tokens);
+  void handleGpioCommands(const std::string &action, std::vector<std::string> &tokens);
   void parseCommand(std::vector<std::string> &tokens);
 
  public:

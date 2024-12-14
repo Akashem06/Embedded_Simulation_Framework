@@ -18,8 +18,7 @@
 class TCPClient {
  private:
   static constexpr size_t MAX_BUFFER_SIZE = 256;
-  using messageCallback =
-      std::function<std::string(TCPClient *client, std::string &)>;
+  using messageCallback = std::function<std::string(TCPClient *client, std::string &)>;
   using connectCallback = std::function<void(TCPClient *client)>;
   int m_clientSocket;
   std::string m_host;
@@ -40,8 +39,7 @@ class TCPClient {
   bool waitForSocket(int timeout_ms, bool read);
 
  public:
-  TCPClient(const std::string &host, int port, messageCallback messageCallback,
-            connectCallback connectCallback);
+  TCPClient(const std::string &host, int port, messageCallback messageCallback, connectCallback connectCallback);
   ~TCPClient();
 
   void connectServer();

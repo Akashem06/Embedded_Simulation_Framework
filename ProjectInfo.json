@@ -1,16 +1,85 @@
 {
-  "projects": {
-    "Default Project": {
-      "Gpio States": {
-        "A8": "LOW",
-        "C12": "LOW",
-        "D8": "LOW"
-      },
-      "Hardware Model": "MS16.0.0",
-      "Project Name": "Default Project",
-      "Project Status": "RUNNING",
-      "Project Uptime": "0"
-    }
-  },
-  "version": "1.0.0"
+    "projects": {
+        "Default Project": {
+            "Gpio States": {
+                "A0": "LOW",
+                "A1": "LOW",
+                "A10": "LOW",
+                "A11": "LOW",
+                "A12": "LOW",
+                "A13": "LOW",
+                "A14": "LOW",
+                "A15": "LOW",
+                "A2": "LOW",
+                "A3": "LOW",
+                "A4": "LOW",
+                "A5": "LOW",
+                "A6": "LOW",
+                "A7": "LOW",
+                "A8": "LOW",
+                "A9": "LOW",
+                "B0": "LOW",
+                "B1": "LOW",
+                "B10": "LOW",
+                "B11": "LOW",
+                "B12": "LOW",
+                "B13": "LOW",
+                "B14": "LOW",
+                "B15": "LOW",
+                "B2": "LOW",
+                "B3": "LOW",
+                "B4": "LOW",
+                "B5": "LOW",
+                "B6": "LOW",
+                "B7": "LOW",
+                "B8": "LOW",
+                "B9": "LOW"
+            },
+            "Hardware Model": "MS16.0.0",
+            "Project Name": "Default Project",
+            "Project Status": "RUNNING",
+            "Project Uptime": "0"
+        },
+        "Default Project (1)": {
+            "Gpio States": {
+                "A0": "LOW",
+                "A1": "LOW",
+                "A10": "LOW",
+                "A11": "LOW",
+                "A12": "LOW",
+                "A13": "LOW",
+                "A14": "LOW",
+                "A15": "LOW",
+                "A2": "LOW",
+                "A3": "LOW",
+                "A4": "LOW",
+                "A5": "LOW",
+                "A6": "LOW",
+                "A7": "LOW",
+                "A8": "LOW",
+                "A9": "LOW",
+                "B0": "LOW",
+                "B1": "LOW",
+                "B10": "LOW",
+                "B11": "LOW",
+                "B12": "LOW",
+                "B13": "LOW",
+                "B14": "LOW",
+                "B15": "LOW",
+                "B2": "LOW",
+                "B3": "LOW",
+                "B4": "LOW",
+                "B5": "LOW",
+                "B6": "LOW",
+                "B7": "LOW",
+                "B8": "LOW",
+                "B9": "LOW"
+            },
+            "Hardware Model": "MS16.0.0",
+            "Project Name": "Default Project (1)",
+            "Project Status": "RUNNING",
+            "Project Uptime": "0"
+        }
+    },
+    "version": "1.0.0"
 }

@@ -27,32 +27,21 @@ void NTPClient::NTPClientProcedure() {
 
   while (m_isSynchronizing) {
     NTPPacket request = {};
-    request.flags =
-        (NTP_VERSION << NTP_VERSION_OFFSET) |
-        (NTPLeapIndicator::NTP_LI_NOSYNC << NTP_LEAP_INDICATOR_OFFSET) |
-        (NTPMode::NTP_CLIENT_MODE << NTP_MODE_OFFSET);
+    request.flags = (NTP_VERSION << NTP_VERSION_OFFSET) | (NTPLeapIndicator::NTP_LI_NOSYNC << NTP_LEAP_INDICATOR_OFFSET) | (NTPMode::NTP_CLIENT_MODE << NTP_MODE_OFFSET);
 
     /* Convert UNIX time in seconds to NTP time */
-    request.transmitTime.seconds =
-        htonl(unixToNTPTime(std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now())));
+    request.transmitTime.seconds = htonl(unixToNTPTime(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())));
 
     /* Obtain the fractional time */
-    request.transmitTime.fraction = htonl(static_cast<uint32_t>(
-        std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch())
-            .count() %
-        1000000));
+    request.transmitTime.fraction = htonl(static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 1000000));
 
-    if (sendto(ntpSocket, &request, sizeof(request), 0,
-               (struct sockaddr *)&serverAddr, sizeof(serverAddr)) <= 0) {
+    if (sendto(ntpSocket, &request, sizeof(request), 0, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) <= 0) {
       close(ntpSocket);
       throw std::runtime_error("Error sending NTP request");
     }
 
     NTPPacket serverResponse = {};
-    if (recvfrom(ntpSocket, &serverResponse, sizeof(serverResponse), 0, nullptr,
-                 nullptr) <= 0) {
+    if (recvfrom(ntpSocket, &serverResponse, sizeof(serverResponse), 0, nullptr, nullptr) <= 0) {
       close(ntpSocket);
       throw std::runtime_error("Error receiving NTP response");
     }

@@ -21,11 +21,11 @@ class GpioManager {
  public:
   GpioManager() = default;
 
-  void updateGpioStates(std::string &projectName, std::string &payload);
+  void updateGpioPinState(std::string &projectName, std::string &payload);
+  void updateGpioAllStates(std::string &projectName, std::string &payload);
   void updateGpioModes(std::string &projectName, std::string &payload);
 
-  std::string createGpioCommand(CommandCode commandCode,
-                                std::string &gpioPortPin, std::string data);
+  std::string createGpioCommand(CommandCode commandCode, std::string &gpioPortPin, std::string data);
 };
 
 #endif

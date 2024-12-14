@@ -9,18 +9,9 @@
 namespace Datagram {
 class Gpio {
  public:
-  static const constexpr uint8_t NO_DATA_FLAG = 0xFF;
   static const constexpr uint8_t PINS_PER_PORT = 16U;
 
-  enum class Port {
-    GPIO_PORT_A = 0,
-    GPIO_PORT_B,
-    GPIO_PORT_C,
-    GPIO_PORT_D,
-    GPIO_PORT_E,
-    GPIO_PORT_H,
-    NUM_GPIO_PORTS
-  };
+  enum class Port { GPIO_PORT_A = 0, GPIO_PORT_B, NUM_GPIO_PORTS };
 
   enum class State {
     GPIO_STATE_LOW = 0,
@@ -42,7 +33,7 @@ class Gpio {
   struct Payload {
     Port gpioPort;
     uint8_t gpioPin;
-    uint8_t data;
+    uint32_t data;
   };
 
   explicit Gpio(Payload &data);
@@ -53,11 +44,11 @@ class Gpio {
 
   void setGpioPort(const Port &gpioPort);
   void setGpioPin(const uint8_t &gpioPin);
-  void setData(const uint8_t &data);
+  void setData(const uint32_t &data);
 
   Port getGpioPort() const;
   uint8_t getGpioPin() const;
-  uint8_t getData() const;
+  uint32_t getData() const;
 
  private:
   Payload m_gpioDatagram;

@@ -12,19 +12,19 @@ TCPServer::TCPServer() {
   pthread_mutex_init(&m_mutex, nullptr);
 }
 
-TCPServer::~TCPServer() { pthread_mutex_destroy(&m_mutex); }
+TCPServer::~TCPServer() {
+  pthread_mutex_destroy(&m_mutex);
+}
 
 void TCPServer::listenThreadProcedure() {
   m_listeningSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
   if (m_listeningSocket < 0) {
-    throw std::runtime_error("Error creating socket for port " +
-                             std::to_string(m_listenPort));
+    throw std::runtime_error("Error creating socket for port " + std::to_string(m_listenPort));
   }
 
   int enable = 1;
-  if (setsockopt(m_listeningSocket, SOL_SOCKET, SO_REUSEADDR, &enable,
-                 sizeof(int)) < 0) {
+  if (setsockopt(m_listeningSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
     throw std::runtime_error("Error setting socket option SO_REUSEADDR");
   }
   memset((char *)&m_serverAddress, 0U, sizeof(m_serverAddress));
@@ -32,8 +32,7 @@ void TCPServer::listenThreadProcedure() {
   m_serverAddress.sin_port = htons(m_listenPort);
   m_serverAddress.sin_addr.s_addr = INADDR_ANY; /* Listen to all addresses */
 
-  if (bind(m_listeningSocket, (struct sockaddr *)&m_serverAddress,
-           sizeof(m_serverAddress)) < 0) {
+  if (bind(m_listeningSocket, (struct sockaddr *)&m_serverAddress, sizeof(m_serverAddress)) < 0) {
     throw std::runtime_error("Error binding socket");
   }
 
@@ -67,7 +66,8 @@ void *listenThreadWrapper(void *param) {
 }
 
 void TCPServer::listenClients(int port, serverCallback callback) {
-  if (m_isListening) return;
+  if (m_isListening)
+    return;
 
   m_listenPort = port;
   m_serverCallback = callback;

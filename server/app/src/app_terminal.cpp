@@ -8,38 +8,42 @@
 #include "app.h"
 #include "command_code.h"
 
-Terminal::Terminal(TCPServer *server) { m_Server = server; }
+Terminal::Terminal(TCPServer *server) {
+  m_Server = server;
+}
 
 std::string Terminal::toLower(const std::string &input) {
   std::string lowered = input;
-  std::transform(lowered.begin(), lowered.end(), lowered.begin(),
-                 [](unsigned char c) { return std::tolower(c); });
+  std::transform(lowered.begin(), lowered.end(), lowered.begin(), [](unsigned char c) { return std::tolower(c); });
   return lowered;
 }
 
-void Terminal::handleGpioCommands(const std::string &action,
-                                  std::vector<std::string> &tokens) {
+void Terminal::handleGpioCommands(const std::string &action, std::vector<std::string> &tokens) {
   std::string message;
-  if (action == "get_state" && tokens.size() >= 3) {
-    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_STATE,
-                                                  tokens[2], "");
-    std::cout << message << std::endl;
-    if (!message.empty()) {
-      m_Server->sendMessage(m_targetClient, message);
-    } else {
-      std::cout << "Invalid command. Example: 'GPIO GET_STATE A12'"
-                << std::endl;
-    }
-    m_targetClient = nullptr;
+  if (action == "get_pin_state" && tokens.size() >= 3) {
+    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_PIN_STATE, tokens[2], "");
+  } else if (action == "get_all_states" && tokens.size() >= 2) {
+    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_ALL_STATES, tokens[0], "");
+  } else if (action == "get_pin_mode" && tokens.size() >= 3) {
+    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_PIN_MODE, tokens[2], "");
+  } else if (action == "get_all_modes" && tokens.size() >= 2) {
+    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_ALL_MODES, tokens[0], "");
   } else if (action == "set_state" && tokens.size() >= 4) {
   } else if (action == "gpio_get_alt_function" && tokens.size() >= 3) {
   } else {
     std::cerr << "Unsupported action: " << action << std::endl;
   }
+
+  if (!message.empty()) {
+    m_Server->sendMessage(m_targetClient, message);
+  } else {
+    std::cout << "Invalid command. Refer to sim_command.md" << std::endl;
+  }
+  m_targetClient = nullptr;
 }
 
 void Terminal::parseCommand(std::vector<std::string> &tokens) {
-  if (tokens.size() < 3) {
+  if (tokens.size() < 2) {
     std::cout << "Invalid command. Format: <interface> <action> <args...>\n";
     return;
   }
@@ -85,8 +89,7 @@ void Terminal::run() {
       std::cout << "Invalid client selection." << std::endl << std::endl;
       continue;
     }
-    std::cout << "Selected " << m_targetClient->getClientName() << std::endl
-              << std::endl;
+    std::cout << "Selected " << m_targetClient->getClientName() << std::endl << std::endl;
 
     std::cout << "Enter commmand > ";
     std::getline(std::cin, input);
@@ -100,8 +103,8 @@ void Terminal::run() {
 
     /**
      * Create tokens out of input string
-     * Input = "GPIO GET_STATE A9"
-     * tokens = ["GPIO", "GET_STATE", "A9"]
+     * Input = "GPIO GET_PIN_STATE A9"
+     * tokens = ["GPIO", "GET_PIN_STATE", "A9"]
      */
     std::vector<std::string> tokens;
     std::istringstream iss(input);

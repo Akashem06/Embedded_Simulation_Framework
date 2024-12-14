@@ -23,23 +23,17 @@ bool NTPServer::queryNTPServer(NTPPacket &response) {
   }
 
   NTPPacket request = {};
-  request.flags =
-      (NTP_VERSION << NTP_VERSION_OFFSET) |
-      (NTPLeapIndicator::NTP_LI_NOSYNC << NTP_LEAP_INDICATOR_OFFSET) |
-      (NTPMode::NTP_CLIENT_MODE << NTP_MODE_OFFSET);
+  request.flags = (NTP_VERSION << NTP_VERSION_OFFSET) | (NTPLeapIndicator::NTP_LI_NOSYNC << NTP_LEAP_INDICATOR_OFFSET) | (NTPMode::NTP_CLIENT_MODE << NTP_MODE_OFFSET);
 
   auto now = std::chrono::system_clock::now();
   auto duration = now.time_since_epoch();
   auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
-  auto nanoSeconds =
-      std::chrono::duration_cast<std::chrono::nanoseconds>(duration);
+  auto nanoSeconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration);
 
   request.transmitTime.seconds = seconds.count() + NTP_UNIX_EPOCH_DIFF;
-  request.transmitTime.fraction = static_cast<uint32_t>(
-      (nanoSeconds.count() % 1000000000ULL) * 4.294967296);
+  request.transmitTime.fraction = static_cast<uint32_t>((nanoSeconds.count() % 1000000000ULL) * 4.294967296);
 
-  if (sendto(ntpSocket, &request, sizeof(request), 0, addrs->ai_addr,
-             addrs->ai_addrlen) < 0) {
+  if (sendto(ntpSocket, &request, sizeof(request), 0, addrs->ai_addr, addrs->ai_addrlen) < 0) {
     close(ntpSocket);
     freeaddrinfo(addrs);
     throw std::runtime_error("Send failed");
@@ -49,9 +43,7 @@ bool NTPServer::queryNTPServer(NTPPacket &response) {
   sockaddr_storage serverAddr;
   socklen_t serverAddrLen = sizeof(serverAddr);
 
-  ssize_t receivedBytes =
-      recvfrom(ntpSocket, &serverResponse, sizeof(serverResponse), 0,
-               reinterpret_cast<sockaddr *>(&serverAddr), &serverAddrLen);
+  ssize_t receivedBytes = recvfrom(ntpSocket, &serverResponse, sizeof(serverResponse), 0, reinterpret_cast<sockaddr *>(&serverAddr), &serverAddrLen);
 
   freeaddrinfo(addrs);
 
@@ -76,10 +68,7 @@ bool NTPServer::queryNTPServer(NTPPacket &response) {
 
 NTPPacket NTPServer::processNTPRequest(const NTPPacket &request) {
   NTPPacket response = {};
-  response.flags =
-      (NTP_VERSION << NTP_VERSION_OFFSET) |
-      (NTPLeapIndicator::NTP_LI_NONE << NTP_LEAP_INDICATOR_OFFSET) |
-      (NTPMode::NTP_SERVER_MODE << NTP_MODE_OFFSET);
+  response.flags = (NTP_VERSION << NTP_VERSION_OFFSET) | (NTPLeapIndicator::NTP_LI_NONE << NTP_LEAP_INDICATOR_OFFSET) | (NTPMode::NTP_SERVER_MODE << NTP_MODE_OFFSET);
 
   response.stratum = 2U;
   response.poll = 4U;      /* 2^4 = 16 seconds between succesive messages. */
@@ -94,13 +83,8 @@ NTPPacket NTPServer::processNTPRequest(const NTPPacket &request) {
   response.referenceId[3] = 'L';
 
   auto now = std::chrono::system_clock::now();
-  uint32_t currentSeconds =
-      unixToNTPTime(std::chrono::system_clock::to_time_t(now));
-  uint32_t currentFraction = static_cast<uint32_t>(
-      std::chrono::duration_cast<std::chrono::microseconds>(
-          now.time_since_epoch())
-          .count() %
-      1000000);
+  uint32_t currentSeconds = unixToNTPTime(std::chrono::system_clock::to_time_t(now));
+  uint32_t currentFraction = static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count() % 1000000);
 
   response.referenceTime.seconds = htonl(currentSeconds);
   response.referenceTime.fraction = htonl(currentFraction);
@@ -126,13 +110,11 @@ void NTPServer::NTPServerProcedure() {
   m_NTPSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
   if (m_NTPSocket < 0) {
-    throw std::runtime_error("Error creating socket for NTP server: " +
-                             m_NTPServerAddress);
+    throw std::runtime_error("Error creating socket for NTP server: " + m_NTPServerAddress);
   }
 
   int enable = 1;
-  if (setsockopt(m_NTPSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) <
-      0) {
+  if (setsockopt(m_NTPSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
     throw std::runtime_error("Error setting socket option SO_REUSEADDR");
   }
 
@@ -143,12 +125,10 @@ void NTPServer::NTPServerProcedure() {
 
   if (inet_pton(AF_INET, m_bindAddress.c_str(), &serverAddr.sin_addr) <= 0) {
     close(m_NTPSocket);
-    throw std::runtime_error(
-        "Error converting IPv4 bind address to binary form");
+    throw std::runtime_error("Error converting IPv4 bind address to binary form");
   }
 
-  if (bind(m_NTPSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) <
-      0) {
+  if (bind(m_NTPSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
     close(m_NTPSocket);
     throw std::runtime_error("Error binding NTP socket");
   }
@@ -160,16 +140,14 @@ void NTPServer::NTPServerProcedure() {
     struct sockaddr_in clientAddress;
     socklen_t clientLength = sizeof(clientAddress);
 
-    if (recvfrom(m_NTPSocket, &request, sizeof(request), 0,
-                 (struct sockaddr *)&clientAddress, &clientLength) <= 0) {
+    if (recvfrom(m_NTPSocket, &request, sizeof(request), 0, (struct sockaddr *)&clientAddress, &clientLength) <= 0) {
       std::cerr << "Error receiving NTP request" << std::endl;
       continue;
     }
 
     NTPPacket response = processNTPRequest(request);
     dumpNTPPacketData(response);
-    if (sendto(m_NTPSocket, &response, sizeof(response), 0,
-               (struct sockaddr *)&clientAddress, clientLength) <= 0) {
+    if (sendto(m_NTPSocket, &response, sizeof(response), 0, (struct sockaddr *)&clientAddress, clientLength) <= 0) {
       std::cerr << "Error sending NTP response" << std::endl;
     }
   }
@@ -190,9 +168,9 @@ void *NTPServerWrapper(void *param) {
   return nullptr;
 }
 
-void NTPServer::startListening(const std::string &bindAddress,
-                               const std::string &NTPServerAddress) {
-  if (m_isListening) return;
+void NTPServer::startListening(const std::string &bindAddress, const std::string &NTPServerAddress) {
+  if (m_isListening)
+    return;
 
   m_NTPServerAddress = NTPServerAddress;
   m_bindAddress = bindAddress;

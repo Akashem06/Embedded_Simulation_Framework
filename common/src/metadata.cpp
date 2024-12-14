@@ -25,11 +25,12 @@ void Metadata::deserialize(std::string &metadataPayload) {
   m_metadata.projectName = deserializeString(metadataPayload, offset);
   m_metadata.projectStatus = deserializeString(metadataPayload, offset);
   m_metadata.hardwareModel = deserializeString(metadataPayload, offset);
-  m_metadata.projectRuntime =
-      deserializeInteger<uint32_t>(metadataPayload, offset);
+  m_metadata.projectRuntime = deserializeInteger<uint32_t>(metadataPayload, offset);
 }
 
-Metadata::Metadata(Payload &data) { m_metadata = data; }
+Metadata::Metadata(Payload &data) {
+  m_metadata = data;
+}
 
 void Metadata::setProjectName(const std::string &projectName) {
   m_metadata.projectName = projectName;
@@ -47,7 +48,9 @@ void Metadata::setProjectRuntime(const int &projectRuntime) {
   m_metadata.projectRuntime = projectRuntime;
 }
 
-std::string Metadata::getProjectName() const { return m_metadata.projectName; }
+std::string Metadata::getProjectName() const {
+  return m_metadata.projectName;
+}
 
 std::string Metadata::getProjectStatus() const {
   return m_metadata.projectStatus;
@@ -57,5 +60,7 @@ std::string Metadata::getHardwareModel() const {
   return m_metadata.hardwareModel;
 }
 
-int Metadata::getProjectRuntime() const { return m_metadata.projectRuntime; }
+int Metadata::getProjectRuntime() const {
+  return m_metadata.projectRuntime;
+}
 }  // namespace Datagram

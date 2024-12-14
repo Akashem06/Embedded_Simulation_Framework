@@ -9,8 +9,10 @@ enum class CommandCode {
 
   /* GPIO Commands */
   GPIO_SET_STATE,
-  GPIO_GET_STATE,
-  GPIO_GET_MODE,
+  GPIO_GET_PIN_STATE,
+  GPIO_GET_ALL_STATES,
+  GPIO_GET_PIN_MODE,
+  GPIO_GET_ALL_MODES,
   GPIO_GET_ALT_FUNCTION,
 
   /* I2C Commands */

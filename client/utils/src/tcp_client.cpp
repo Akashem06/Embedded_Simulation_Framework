@@ -98,19 +98,18 @@ void *receiverThreadProcedure(void *param) {
 void TCPClient::connectServer() {
   m_clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (m_clientSocket < 0) throw std::runtime_error("Error created socket");
+  if (m_clientSocket < 0)
+    throw std::runtime_error("Error created socket");
 
   m_serverAddress.sin_family = AF_INET;
   m_serverAddress.sin_port = htons(m_port);
 
   if (inet_pton(AF_INET, m_host.c_str(), &m_serverAddress.sin_addr) <= 0) {
     close(m_clientSocket);
-    throw std::runtime_error(
-        "Error converting IPv4 host address to binary form");
+    throw std::runtime_error("Error converting IPv4 host address to binary form");
   }
 
-  if (connect(m_clientSocket, (struct sockaddr *)&m_serverAddress,
-              sizeof(m_serverAddress)) < 0) {
+  if (connect(m_clientSocket, (struct sockaddr *)&m_serverAddress, sizeof(m_serverAddress)) < 0) {
     close(m_clientSocket);
     throw std::runtime_error("Error connecting socket");
   }
@@ -127,14 +126,12 @@ void TCPClient::connectServer() {
     m_connectCallback(this);
   }
 
-  if (pthread_create(&m_receiverThreadId, NULL, receiverThreadProcedure,
-                     this)) {
+  if (pthread_create(&m_receiverThreadId, NULL, receiverThreadProcedure, this)) {
     close(m_clientSocket);
     throw std::runtime_error("Failed to create receiver thread");
   }
 
-  if (pthread_create(&m_processMessageThreadId, NULL, processMessagesThread,
-                     this)) {
+  if (pthread_create(&m_processMessageThreadId, NULL, processMessagesThread, this)) {
     close(m_clientSocket);
     throw std::runtime_error("Failed to create process messages thread");
   }
@@ -149,7 +146,8 @@ void TCPClient::disconnectServer() {
 
 void TCPClient::sendMessage(const std::string &message) {
   int n = send(m_clientSocket, message.c_str(), message.size(), 0);
-  if (n < 0) throw std::runtime_error("Error sending message");
+  if (n < 0)
+    throw std::runtime_error("Error sending message");
 }
 
 std::string TCPClient::receiveMessage() {
@@ -161,11 +159,11 @@ std::string TCPClient::receiveMessage() {
   return message;
 }
 
-bool TCPClient::isConnected() const { return m_isConnected; }
+bool TCPClient::isConnected() const {
+  return m_isConnected;
+}
 
-TCPClient::TCPClient(const std::string &host, int port,
-                     messageCallback messageCallback,
-                     connectCallback connectCallback) {
+TCPClient::TCPClient(const std::string &host, int port, messageCallback messageCallback, connectCallback connectCallback) {
   this->m_host = host;
   this->m_port = port;
   this->m_clientSocket = -1;

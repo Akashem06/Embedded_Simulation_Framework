@@ -61,8 +61,7 @@ void *monitorThreadWrapper(void *param) {
 
 bool ClientConnection::acceptClient(int listeningSocket) {
   socklen_t clientLength = sizeof(m_clientAddress);
-  m_clientSocket = accept(listeningSocket, (struct sockaddr *)&m_clientAddress,
-                          &clientLength);
+  m_clientSocket = accept(listeningSocket, (struct sockaddr *)&m_clientAddress, &clientLength);
 
   if (m_clientSocket < 0) {
     std::cerr << "Failed to accept client connection" << std::endl;
@@ -74,8 +73,7 @@ bool ClientConnection::acceptClient(int listeningSocket) {
       m_clientName = getClientAddress();
     }
 
-    if (pthread_create(&m_monitorThreadId, nullptr, monitorThreadWrapper,
-                       this) < 0) {
+    if (pthread_create(&m_monitorThreadId, nullptr, monitorThreadWrapper, this) < 0) {
       throw std::runtime_error("Error creating monitor thread");
     }
 
@@ -103,14 +101,22 @@ void ClientConnection::sendMessage(const std::string &message) {
   }
 }
 
-std::string ClientConnection::getClientName() const { return m_clientName; }
+std::string ClientConnection::getClientName() const {
+  return m_clientName;
+}
 
 void ClientConnection::setClientName(const std::string &name) {
   m_clientName = name;
 }
 
-int ClientConnection::getClientPort() const { return m_clientPort; }
+int ClientConnection::getClientPort() const {
+  return m_clientPort;
+}
 
-void ClientConnection::setClientPort(int port) { m_clientPort = port; }
+void ClientConnection::setClientPort(int port) {
+  m_clientPort = port;
+}
 
-bool ClientConnection::isConnected() { return m_isConnected; }
+bool ClientConnection::isConnected() {
+  return m_isConnected;
+}

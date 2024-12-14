@@ -1,7 +1,6 @@
 #include "json_manager.h"
 
-nlohmann::json JSONManager::createDefaultProjectJSON(
-    const std::string &projectName) {
+nlohmann::json JSONManager::createDefaultProjectJSON(const std::string &projectName) {
   return {{"project_name", projectName}, {"version", PROJECT_VERSION}};
 }
 
@@ -17,7 +16,7 @@ void JSONManager::loadGlobalJSON() {
 void JSONManager::saveGlobalJSON() {
   try {
     std::ofstream globalJSON(m_JSONPath);
-    globalJSON << m_globalJSON.dump(2);
+    globalJSON << m_globalJSON.dump(4);
   } catch (const std::exception &e) {
     std::cerr << "Error saving global JSON: " << e.what() << std::endl;
   }
@@ -27,8 +26,7 @@ JSONManager::JSONManager() {
   m_JSONPath = DEFAULT_JSON_PATH;
 
   try {
-    m_globalJSON = {{"version", "1.0.0"},
-                    {"projects", nlohmann::json::object()}};
+    m_globalJSON = {{"version", "1.0.0"}, {"projects", nlohmann::json::object()}};
     saveGlobalJSON();
   } catch (const std::exception &e) {
     std::cerr << "Error initializing global JSON: " << e.what() << std::endl;
@@ -40,8 +38,7 @@ nlohmann::json &JSONManager::getProjectJSON(const std::string &projectName) {
     loadGlobalJSON();
 
     if (!m_globalJSON["projects"].contains(projectName)) {
-      m_globalJSON["projects"][projectName] =
-          createDefaultProjectJSON(projectName);
+      m_globalJSON["projects"][projectName] = createDefaultProjectJSON(projectName);
       saveGlobalJSON();
     }
 

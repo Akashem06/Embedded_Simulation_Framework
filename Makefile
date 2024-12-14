@@ -94,7 +94,7 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 format:
-	clang-format -i -style=file --style=Google $(COMMON_SRC) $(COMMON_INC) \
+	clang-format -i -style=file $(COMMON_SRC) $(COMMON_INC) \
 	$(SERVER_APP_SRC) $(SERVER_APP_INC) $(SERVER_UTILS_SRC) $(SERVER_UTILS_INC) \
 	$(CLIENT_APP_SRC) $(CLIENT_APP_INC) $(CLIENT_UTILS_SRC) $(CLIENT_UTILS_INC) \
 	$(DRIVERS_SRC) $(DRIVERS_INC)

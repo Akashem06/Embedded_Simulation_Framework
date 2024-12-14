@@ -10,8 +10,7 @@
 #include "metadata.h"
 #include "spi_datagram.h"
 
-void applicationCallback(TCPServer *srv, ClientConnection *src,
-                         std::string &message) {
+void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &message) {
   std::string clientName = src->getClientName();
 
   auto [commandCode, payload] = decodeCommand(message);
@@ -24,23 +23,22 @@ void applicationCallback(TCPServer *srv, ClientConnection *src,
         srv->updateClientName(src, clientMetadata.getProjectName());
       }
 
-      globalJSON.setProjectValue(src->getClientName(), "Project Name",
-                                 clientMetadata.getProjectName());
-      globalJSON.setProjectValue(src->getClientName(), "Project Status",
-                                 clientMetadata.getProjectStatus());
-      globalJSON.setProjectValue(src->getClientName(), "Hardware Model",
-                                 clientMetadata.getHardwareModel());
-      globalJSON.setProjectValue(
-          src->getClientName(), "Project Uptime",
-          std::to_string(clientMetadata.getProjectRuntime()));
+      globalJSON.setProjectValue(src->getClientName(), "Project Name", src->getClientName()); /* Get the updated name if there are duplicates */
+      globalJSON.setProjectValue(src->getClientName(), "Project Status", clientMetadata.getProjectStatus());
+      globalJSON.setProjectValue(src->getClientName(), "Hardware Model", clientMetadata.getHardwareModel());
+      globalJSON.setProjectValue(src->getClientName(), "Project Uptime", std::to_string(clientMetadata.getProjectRuntime()));
 
       break;
     }
-    case CommandCode::GPIO_GET_STATE: {
-      serverGpioManager.updateGpioStates(clientName, payload);
+    case CommandCode::GPIO_GET_PIN_STATE: {
+      serverGpioManager.updateGpioPinState(clientName, payload);
       break;
     }
-    case CommandCode::GPIO_GET_MODE: {
+    case CommandCode::GPIO_GET_ALL_STATES: {
+      serverGpioManager.updateGpioAllStates(clientName, payload);
+      break;
+    }
+    case CommandCode::GPIO_GET_PIN_MODE: {
       break;
     }
     case CommandCode::GPIO_GET_ALT_FUNCTION: {

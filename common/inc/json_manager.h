@@ -25,8 +25,7 @@ class JSONManager {
   nlohmann::json &getProjectJSON(const std::string &projectName);
 
   template <typename T>
-  void setProjectValue(const std::string &projectName, const std::string &key,
-                       T value) {
+  void setProjectValue(const std::string &projectName, const std::string &key, T value) {
     try {
       loadGlobalJSON();
 
