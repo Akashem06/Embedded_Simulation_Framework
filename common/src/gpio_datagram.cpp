@@ -12,8 +12,9 @@ std::string Gpio::serialize(const CommandCode &commandCode) const {
 
   serializeInteger<uint8_t>(serializedData,
                             static_cast<uint8_t>(m_gpioDatagram.gpioPort));
-  serializeInteger<uint16_t>(serializedData, m_gpioDatagram.gpioPin);
-  if (m_gpioDatagram.data != GPIO_DATAGRAM_NO_DATA_FLAG) {
+  serializeInteger<uint8_t>(serializedData,
+                            static_cast<uint8_t>(m_gpioDatagram.gpioPin));
+  if (m_gpioDatagram.data < Datagram::Gpio::NO_DATA_FLAG) {
     serializeInteger<uint8_t>(serializedData, m_gpioDatagram.data);
   }
   return encodeCommand(commandCode, serializedData);
@@ -28,12 +29,12 @@ void Gpio::deserialize(std::string &gpioDatagramPayload) {
   m_gpioDatagram.gpioPort = static_cast<Port>(
       deserializeInteger<uint8_t>(gpioDatagramPayload, offset));
   m_gpioDatagram.gpioPin =
-      deserializeInteger<uint16_t>(gpioDatagramPayload, offset);
-  if (offset < gpioDatagramPayload.size()) {
+      deserializeInteger<uint8_t>(gpioDatagramPayload, offset);
+  if (offset <= gpioDatagramPayload.size()) {
     m_gpioDatagram.data =
         deserializeInteger<uint8_t>(gpioDatagramPayload, offset);
   } else {
-    m_gpioDatagram.data = GPIO_DATAGRAM_NO_DATA_FLAG;
+    m_gpioDatagram.data = Datagram::Gpio::NO_DATA_FLAG;
   }
 }
 
@@ -43,14 +44,16 @@ void Gpio::setGpioPort(const Port &gpioPort) {
   m_gpioDatagram.gpioPort = gpioPort;
 }
 
-void Gpio::setGpioPin(const int &gpioPin) { m_gpioDatagram.gpioPin = gpioPin; }
+void Gpio::setGpioPin(const uint8_t &gpioPin) {
+  m_gpioDatagram.gpioPin = gpioPin;
+}
 
-void Gpio::setData(const int &data) { m_gpioDatagram.data = data; }
+void Gpio::setData(const uint8_t &data) { m_gpioDatagram.data = data; }
 
 Gpio::Port Gpio::getGpioPort() const { return m_gpioDatagram.gpioPort; }
 
-int Gpio::getGpioPin() const { return m_gpioDatagram.gpioPin; }
+uint8_t Gpio::getGpioPin() const { return m_gpioDatagram.gpioPin; }
 
-int Gpio::getData() const { return m_gpioDatagram.data; }
+uint8_t Gpio::getData() const { return m_gpioDatagram.data; }
 
 }  // namespace Datagram

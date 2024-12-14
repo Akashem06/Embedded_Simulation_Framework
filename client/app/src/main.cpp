@@ -1,17 +1,18 @@
 #include <iostream>
 
 #include "app.h"
+#include "app_callback.h"
+#include "gpio_manager.h"
 #include "metadata.h"
 #include "ntp_client.h"
 #include "tcp_client.h"
 
-std::string messageCallback(TCPClient *client, const std::string &message) {
-  std::cout << "Received message: " << message << std::endl;
-}
+GpioManager clientGpioManager;
+std::string projectName = DEFAULT_PROJECT_NAME;
 
 void connectCallback(TCPClient *client) {
   Datagram::Metadata::Payload initialData = {
-      .projectName = "SAMPLE PROJECT",
+      .projectName = projectName,
       .projectStatus = "RUNNING",
       .hardwareModel = "MS16.0.0",
       .projectRuntime = 0,
@@ -25,7 +26,8 @@ void connectCallback(TCPClient *client) {
 int main(int argc, char **argv) {
   std::cout << "Running Client" << std::endl;
 
-  TCPClient serverClient("127.0.0.1", 1024, messageCallback, connectCallback);
+  TCPClient serverClient("127.0.0.1", 1024, applicationMessageCallback,
+                         connectCallback);
   serverClient.connectServer();
 
 #if USE_NETWORK_TIME_PROTOCOL == 1U

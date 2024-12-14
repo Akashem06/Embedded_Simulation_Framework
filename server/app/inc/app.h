@@ -11,6 +11,6 @@
 #endif
 
 extern JSONManager globalJSON;
-extern GpioManager globalGpioManager;
+extern GpioManager serverGpioManager;
 
 #endif

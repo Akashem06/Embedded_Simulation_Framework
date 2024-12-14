@@ -24,7 +24,7 @@ enum class CommandCode {
   NUM_COMMAND_CODES
 };
 
-std::string encodeCommand(const CommandCode commandCode, std::string &msg);
-std::pair<CommandCode, std::string> decodeCommand(std::string &msg);
+std::string encodeCommand(const CommandCode commandCode, std::string &message);
+std::pair<CommandCode, std::string> decodeCommand(std::string &message);
 
 #endif

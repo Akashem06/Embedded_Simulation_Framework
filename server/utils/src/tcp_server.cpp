@@ -107,18 +107,18 @@ void TCPServer::updateClientName(ClientConnection *conn, std::string newName) {
   pthread_mutex_unlock(&m_mutex);
 }
 
-void TCPServer::messageReceived(ClientConnection *src, std::string &msg) {
-  m_serverCallback(this, src, msg);
+void TCPServer::messageReceived(ClientConnection *src, std::string &message) {
+  m_serverCallback(this, src, message);
 }
 
-void TCPServer::sendMessage(ClientConnection *dst, const std::string &msg) {
-  dst->sendMessage(msg);
+void TCPServer::sendMessage(ClientConnection *dst, const std::string &message) {
+  dst->sendMessage(message);
 }
 
-void TCPServer::broadcastMessage(const std::string &msg) {
+void TCPServer::broadcastMessage(const std::string &message) {
   for (auto &pair : m_connections) {
     if (pair.second->isConnected()) {
-      pair.second->sendMessage(msg);
+      pair.second->sendMessage(message);
     }
   }
 }

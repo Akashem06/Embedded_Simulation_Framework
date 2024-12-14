@@ -6,11 +6,12 @@
 
 #include "command_code.h"
 
-#define GPIO_DATAGRAM_NO_DATA_FLAG 0xFFU
-
 namespace Datagram {
 class Gpio {
  public:
+  static const constexpr uint8_t NO_DATA_FLAG = 0xFF;
+  static const constexpr uint8_t PINS_PER_PORT = 16U;
+
   enum class Port {
     GPIO_PORT_A = 0,
     GPIO_PORT_B,
@@ -51,12 +52,12 @@ class Gpio {
   void deserialize(std::string &gpioDatagramPayload);
 
   void setGpioPort(const Port &gpioPort);
-  void setGpioPin(const int &gpioPin);
-  void setData(const int &data);
+  void setGpioPin(const uint8_t &gpioPin);
+  void setData(const uint8_t &data);
 
   Port getGpioPort() const;
-  int getGpioPin() const;
-  int getData() const;
+  uint8_t getGpioPin() const;
+  uint8_t getData() const;
 
  private:
   Payload m_gpioDatagram;

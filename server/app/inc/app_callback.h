@@ -7,6 +7,6 @@
 #include "tcp_server.h"
 
 void applicationCallback(TCPServer *srv, ClientConnection *src,
-                         std::string &msg);
+                         std::string &message);
 
 #endif

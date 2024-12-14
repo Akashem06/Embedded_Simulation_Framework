@@ -11,10 +11,10 @@
 #include "spi_datagram.h"
 
 void applicationCallback(TCPServer *srv, ClientConnection *src,
-                         std::string &msg) {
+                         std::string &message) {
   std::string clientName = src->getClientName();
 
-  auto [commandCode, payload] = decodeCommand(msg);
+  auto [commandCode, payload] = decodeCommand(message);
   switch (commandCode) {
     case CommandCode::METADATA: {
       Datagram::Metadata clientMetadata;
@@ -37,7 +37,7 @@ void applicationCallback(TCPServer *srv, ClientConnection *src,
       break;
     }
     case CommandCode::GPIO_GET_STATE: {
-      globalGpioManager.updateGpioStates(clientName, payload);
+      serverGpioManager.updateGpioStates(clientName, payload);
       break;
     }
     case CommandCode::GPIO_GET_MODE: {

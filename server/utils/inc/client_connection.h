@@ -28,7 +28,7 @@ class ClientConnection {
         bool acceptClient(int listeningSocket);
 
         void monitorThreadProcedure();
-        void sendMessage(const std::string &msg);
+        void sendMessage(const std::string &message);
         
         std::string getClientName() const;
         void setClientName(const std::string& name);

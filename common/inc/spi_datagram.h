@@ -8,14 +8,14 @@
 namespace Datagram {
 class SPI {
  public:
-  static constexpr size_t MAX_BUFFER_SIZE = 256;
+  static constexpr size_t SPI_MAX_BUFFER_SIZE = 256;
 
   enum class Port { SPI_PORT_1, SPI_PORT_2, NUM_SPI_PORTS };
 
   struct Payload {
     Port spiPort;
     size_t bufferLength;
-    uint8_t buffer[MAX_BUFFER_SIZE];
+    uint8_t buffer[SPI_MAX_BUFFER_SIZE];
   };
 
   explicit SPI(Payload &data);

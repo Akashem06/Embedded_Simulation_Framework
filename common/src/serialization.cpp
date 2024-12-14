@@ -1,5 +1,6 @@
 #include "serialization.h"
 
+#include <iostream>
 void serializeString(std::string &target, const std::string &str) {
   uint16_t length = static_cast<uint16_t>(str.length());
   serializeInteger(target, length);

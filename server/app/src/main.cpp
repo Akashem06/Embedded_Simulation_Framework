@@ -12,7 +12,7 @@
 #include "tcp_server.h"
 
 JSONManager globalJSON;
-GpioManager globalGpioManager;
+GpioManager serverGpioManager;
 
 int main(int argc, char **argv) {
   std::cout << "Running Server" << std::endl;

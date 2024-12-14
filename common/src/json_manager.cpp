@@ -17,7 +17,7 @@ void JSONManager::loadGlobalJSON() {
 void JSONManager::saveGlobalJSON() {
   try {
     std::ofstream globalJSON(m_JSONPath);
-    globalJSON << m_globalJSON.dump(4);
+    globalJSON << m_globalJSON.dump(2);
   } catch (const std::exception &e) {
     std::cerr << "Error saving global JSON: " << e.what() << std::endl;
   }

@@ -21,7 +21,7 @@ void Terminal::handleGpioCommands(const std::string &action,
                                   std::vector<std::string> &tokens) {
   std::string message;
   if (action == "get_state" && tokens.size() >= 3) {
-    message = globalGpioManager.createGpioCommand(CommandCode::GPIO_GET_STATE,
+    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_STATE,
                                                   tokens[2], "");
     std::cout << message << std::endl;
     if (!message.empty()) {

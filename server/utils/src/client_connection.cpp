@@ -92,13 +92,13 @@ bool ClientConnection::acceptClient(int listeningSocket) {
   return true;
 }
 
-void ClientConnection::sendMessage(const std::string &msg) {
+void ClientConnection::sendMessage(const std::string &message) {
   if (!m_isConnected) {
     throw std::runtime_error("Attempting to send on unconnected socket");
   }
 
-  size_t bytesSent = write(m_clientSocket, msg.c_str(), msg.length());
-  if (bytesSent != msg.length()) {
+  size_t bytesSent = write(m_clientSocket, message.c_str(), message.length());
+  if (bytesSent != message.length()) {
     throw std::runtime_error("Failed to send complete message");
   }
 }

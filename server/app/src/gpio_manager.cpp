@@ -15,9 +15,9 @@ const char *gpioPortNames[] = {
 };
 
 void GpioManager::loadGpioStates(std::string &projectName) {
-  m_gpioStates = globalJSON.getProjectValue<
-      std::unordered_map<std::string, Datagram::Gpio::State>>(projectName,
-                                                              "Gpio States");
+  m_gpioStates =
+      globalJSON.getProjectValue<std::unordered_map<std::string, std::string>>(
+          projectName, "Gpio States");
 }
 
 void GpioManager::loadGpioModes(std::string &projectName) {
@@ -34,9 +34,17 @@ void GpioManager::updateGpioStates(std::string &projectName,
 
   std::string key =
       gpioPortNames[static_cast<uint8_t>(m_gpioDatagram.getGpioPort())];
-  key = key + std::to_string(m_gpioDatagram.getGpioPin());
-  m_gpioStates[key] =
+  key += std::to_string(m_gpioDatagram.getGpioPin());
+  Datagram::Gpio::State receivedPinState =
       static_cast<Datagram::Gpio::State>(m_gpioDatagram.getData());
+
+  if (receivedPinState == Datagram::Gpio::State::GPIO_STATE_HIGH) {
+    m_gpioStates[key] = "HIGH";
+  } else if (receivedPinState == Datagram::Gpio::State::GPIO_STATE_LOW) {
+    m_gpioStates[key] = "LOW";
+  } else {
+    m_gpioStates[key] = "INVALID";
+  }
 
   globalJSON.setProjectValue(projectName, "Gpio States", m_gpioStates);
 }
@@ -47,30 +55,56 @@ void GpioManager::updateGpioModes(std::string &projectName,
 std::string GpioManager::createGpioCommand(CommandCode commandCode,
                                            std::string &gpioPortPin,
                                            std::string data) {
-  if (gpioPortPin.empty() || gpioPortPin.size() < 2) {
-    return "";
-  }
-
-  Datagram::Gpio::Port port =
-      static_cast<Datagram::Gpio::Port>(gpioPortPin[0] - 'A');
-  int pin = std::stoi(gpioPortPin.substr(1));
-
-  m_gpioDatagram.setGpioPort(port);
-  m_gpioDatagram.setGpioPin(pin);
-
-  if (commandCode == CommandCode::GPIO_SET_STATE) {
-    if (data == "HIGH") {
-      m_gpioDatagram.setData(
-          static_cast<int>(Datagram::Gpio::State::GPIO_STATE_HIGH));
-    } else if (data == "LOW") {
-      m_gpioDatagram.setData(
-          static_cast<int>(Datagram::Gpio::State::GPIO_STATE_LOW));
-    } else {
-      return "";
+  try {
+    if (gpioPortPin.empty() || gpioPortPin.size() < 2) {
+      throw std::runtime_error(
+          "Invalid format for port/pin specification. Good examples: 'A9' "
+          "'A12' 'C13'");
     }
-  } else {
-    m_gpioDatagram.setData(GPIO_DATAGRAM_NO_DATA_FLAG);
-  }
 
-  return m_gpioDatagram.serialize(commandCode);
+    Datagram::Gpio::Port port = Datagram::Gpio::Port::NUM_GPIO_PORTS;
+    uint8_t pin = static_cast<uint8_t>(std::stoi(gpioPortPin.substr(1)));
+
+    /* Determine the port */
+    for (uint8_t i = 0U;
+         i < static_cast<uint8_t>(Datagram::Gpio::Port::NUM_GPIO_PORTS); i++) {
+      if (*gpioPortNames[i] == gpioPortPin[0]) {
+        port = static_cast<Datagram::Gpio::Port>(i);
+        break;
+      }
+    }
+
+    if (port >= Datagram::Gpio::Port::NUM_GPIO_PORTS) {
+      throw std::runtime_error(
+          "Invalid selection for Gpio ports. Expected: A, B, C, D, E or H");
+    }
+
+    if (pin >= Datagram::Gpio::PINS_PER_PORT) {
+      throw std::runtime_error(
+          "Exceeded maximum number of Gpio pins: " +
+          std::to_string(static_cast<int>(Datagram::Gpio::PINS_PER_PORT)));
+    }
+
+    m_gpioDatagram.setGpioPort(port);
+    m_gpioDatagram.setGpioPin(pin);
+
+    if (commandCode == CommandCode::GPIO_SET_STATE) {
+      if (data == "HIGH") {
+        m_gpioDatagram.setData(
+            static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_HIGH));
+      } else if (data == "LOW") {
+        m_gpioDatagram.setData(
+            static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_LOW));
+      } else {
+        throw std::runtime_error("Invalid Gpio state: " + data);
+      }
+    } else {
+      m_gpioDatagram.setData(Datagram::Gpio::NO_DATA_FLAG);
+    }
+
+    return m_gpioDatagram.serialize(commandCode);
+  } catch (std::exception &e) {
+    std::cerr << "Gpio Manager error: " << e.what() << std::endl;
+  }
+  return "";
 }

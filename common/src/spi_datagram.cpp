@@ -29,7 +29,7 @@ void SPI::deserialize(std::string &spiDatagramPayload) {
   m_spiDatagram.bufferLength =
       deserializeInteger<uint16_t>(spiDatagramPayload, offset);
 
-  if (m_spiDatagram.bufferLength > MAX_BUFFER_SIZE) {
+  if (m_spiDatagram.bufferLength > SPI_MAX_BUFFER_SIZE) {
     throw std::runtime_error(
         "Deserialized SPI buffer length exceeds maximum allowed size");
   }
@@ -46,7 +46,7 @@ void SPI::setBuffer(const uint8_t *data, size_t length) {
 }
 
 void SPI::clearBuffer() {
-  std::memset(m_spiDatagram.buffer, 0U, MAX_BUFFER_SIZE);
+  std::memset(m_spiDatagram.buffer, 0U, SPI_MAX_BUFFER_SIZE);
 }
 
 SPI::Port SPI::getSPIPort() const { return m_spiDatagram.spiPort; }

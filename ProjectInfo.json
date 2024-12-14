@@ -1,11 +1,16 @@
 {
-    "projects": {
-        "SAMPLE PROJECT": {
-            "Hardware Model": "MS16.0.0",
-            "Project Name": "SAMPLE PROJECT",
-            "Project Status": "RUNNING",
-            "Project Uptime": "0"
-        }
-    },
-    "version": "1.0.0"
+  "projects": {
+    "Default Project": {
+      "Gpio States": {
+        "A8": "LOW",
+        "C12": "LOW",
+        "D8": "LOW"
+      },
+      "Hardware Model": "MS16.0.0",
+      "Project Name": "Default Project",
+      "Project Status": "RUNNING",
+      "Project Uptime": "0"
+    }
+  },
+  "version": "1.0.0"
 }

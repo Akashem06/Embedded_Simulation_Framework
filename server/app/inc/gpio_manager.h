@@ -10,7 +10,7 @@
 
 class GpioManager {
  private:
-  std::unordered_map<std::string, Datagram::Gpio::State> m_gpioStates;
+  std::unordered_map<std::string, std::string> m_gpioStates;
   std::unordered_map<std::string, Datagram::Gpio::Mode> m_gpioModes;
 
   Datagram::Gpio m_gpioDatagram;

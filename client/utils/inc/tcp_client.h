@@ -15,12 +15,11 @@
 #include <queue>
 #include <string>
 
-#define MAX_BUFFER_SIZE 256U
-
 class TCPClient {
  private:
+  static constexpr size_t MAX_BUFFER_SIZE = 256;
   using messageCallback =
-      std::function<std::string(TCPClient *client, const std::string &)>;
+      std::function<std::string(TCPClient *client, std::string &)>;
   using connectCallback = std::function<void(TCPClient *client)>;
   int m_clientSocket;
   std::string m_host;
@@ -52,7 +51,7 @@ class TCPClient {
   void receiverProcedure();
   void processMessages();
 
-  void sendMessage(const std::string &msg);
+  void sendMessage(const std::string &message);
   std::string receiveMessage();
 };
 

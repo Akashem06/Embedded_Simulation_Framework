@@ -50,11 +50,13 @@ class JSONManager {
         throw std::runtime_error("Project not found " + projectName);
       }
 
-      return m_globalJSON["projects"][projectName].at(key).get<T>();
+      if (m_globalJSON["projects"][projectName].contains(key)) {
+        return m_globalJSON["projects"][projectName].at(key).get<T>();
+      }
+
     } catch (const std::exception &e) {
       std::cerr << "Error getting project value: " << e.what() << std::endl;
     }
-
     return static_cast<T>(0U);
   }
 };

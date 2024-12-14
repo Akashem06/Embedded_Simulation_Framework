@@ -147,18 +147,18 @@ void TCPClient::disconnectServer() {
   m_clientSocket = 0;
 }
 
-void TCPClient::sendMessage(const std::string &msg) {
-  int n = send(m_clientSocket, msg.c_str(), msg.size(), 0);
+void TCPClient::sendMessage(const std::string &message) {
+  int n = send(m_clientSocket, message.c_str(), message.size(), 0);
   if (n < 0) throw std::runtime_error("Error sending message");
 }
 
 std::string TCPClient::receiveMessage() {
-  std::string msg(MAX_PACKET_SIZE, '\0');
+  std::string message(MAX_PACKET_SIZE, '\0');
 
-  int n = read(m_clientSocket, &msg[0], MAX_PACKET_SIZE);
-  msg[n] = '\0';
+  int n = read(m_clientSocket, &message[0], MAX_PACKET_SIZE);
+  message[n] = '\0';
 
-  return msg;
+  return message;
 }
 
 bool TCPClient::isConnected() const { return m_isConnected; }
