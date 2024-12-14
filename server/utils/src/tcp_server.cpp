@@ -48,8 +48,6 @@ void TCPServer::listenThreadProcedure() {
       break;
     }
 
-    std::cerr << "Connection established" << std::endl;
-
     updateClientName(conn, conn->getClientName());
   }
 
@@ -121,6 +119,21 @@ void TCPServer::broadcastMessage(const std::string &msg) {
   for (auto &pair : m_connections) {
     if (pair.second->isConnected()) {
       pair.second->sendMessage(msg);
+    }
+  }
+}
+
+ClientConnection *TCPServer::getClientByName(std::string &clientName) {
+  if (m_connections.count(clientName)) {
+    return m_connections[clientName];
+  }
+  return nullptr;
+}
+
+void TCPServer::dumpClientList() {
+  for (auto &pair : m_connections) {
+    if (pair.second->isConnected()) {
+      std::cout << pair.first << std::endl;
     }
   }
 }

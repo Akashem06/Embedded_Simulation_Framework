@@ -25,7 +25,8 @@ void Metadata::deserialize(std::string &metadataPayload) {
   m_metadata.projectName = deserializeString(metadataPayload, offset);
   m_metadata.projectStatus = deserializeString(metadataPayload, offset);
   m_metadata.hardwareModel = deserializeString(metadataPayload, offset);
-  m_metadata.projectRuntime = deserializeInteger<uint32_t>(metadataPayload, offset);
+  m_metadata.projectRuntime =
+      deserializeInteger<uint32_t>(metadataPayload, offset);
 }
 
 Metadata::Metadata(Payload &data) { m_metadata = data; }

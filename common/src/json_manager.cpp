@@ -1,15 +1,11 @@
 #include "json_manager.h"
 
-#include <iostream>
-
-template <typename T>
-nlohmann::json JSONManager<T>::createDefaultProjectJSON(
+nlohmann::json JSONManager::createDefaultProjectJSON(
     const std::string &projectName) {
   return {{"project_name", projectName}, {"version", PROJECT_VERSION}};
 }
 
-template <typename T>
-void JSONManager<T>::loadGlobalJSON() {
+void JSONManager::loadGlobalJSON() {
   try {
     std::ifstream globalJSON(m_JSONPath);
     m_globalJSON = nlohmann::json::parse(globalJSON);
@@ -18,8 +14,7 @@ void JSONManager<T>::loadGlobalJSON() {
   }
 }
 
-template <typename T>
-void JSONManager<T>::saveGlobalJSON() {
+void JSONManager::saveGlobalJSON() {
   try {
     std::ofstream globalJSON(m_JSONPath);
     globalJSON << m_globalJSON.dump(4);
@@ -28,8 +23,7 @@ void JSONManager<T>::saveGlobalJSON() {
   }
 }
 
-template <typename T>
-JSONManager<T>::JSONManager() {
+JSONManager::JSONManager() {
   m_JSONPath = DEFAULT_JSON_PATH;
 
   try {
@@ -41,8 +35,7 @@ JSONManager<T>::JSONManager() {
   }
 }
 
-template <typename T>
-nlohmann::json &JSONManager<T>::getProjectJSON(const std::string &projectName) {
+nlohmann::json &JSONManager::getProjectJSON(const std::string &projectName) {
   try {
     loadGlobalJSON();
 
@@ -59,40 +52,3 @@ nlohmann::json &JSONManager<T>::getProjectJSON(const std::string &projectName) {
 
   return m_globalJSON;
 }
-
-template <typename T>
-void JSONManager<T>::setProjectValue(const std::string &projectName,
-                                     const std::string &key, T value) {
-  try {
-    loadGlobalJSON();
-
-    if (!m_globalJSON["projects"].contains(projectName)) {
-      createDefaultProjectJSON(projectName);
-    }
-
-    m_globalJSON["projects"][projectName][key] = value;
-    saveGlobalJSON();
-  } catch (const std::exception &e) {
-    std::cerr << "Error setting project value: " << e.what() << std::endl;
-  }
-}
-
-template <typename T>
-T JSONManager<T>::getProjectValue(const std::string &projectName,
-                                  const std::string &key) {
-  try {
-    loadGlobalJSON();
-
-    if (!m_globalJSON["projects"].contains(projectName)) {
-      throw std::runtime_error("Project not found " + projectName);
-    }
-
-    return m_globalJSON["projects"][projectName].at(key).get<T>();
-  } catch (const std::exception &e) {
-    std::cerr << "Error getting project value: " << e.what() << std::endl;
-  }
-
-  return static_cast<T>(0U);
-}
-
-template class JSONManager<std::string>;

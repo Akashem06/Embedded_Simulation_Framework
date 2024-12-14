@@ -33,10 +33,14 @@ class TCPServer {
         void stop();
         void listenClients(int port, serverCallback callback);
         void messageReceived(ClientConnection *src, std::string &msg);
+
         void sendMessage(ClientConnection *dst, const std::string &msg);
         void broadcastMessage(const std::string &msg);
         void updateClientName(ClientConnection *conn, std::string newName);
         void removeClient(ClientConnection *conn);
+        ClientConnection *getClientByName(std::string &clientName);
+
+        void dumpClientList();
 };
 
 #endif
