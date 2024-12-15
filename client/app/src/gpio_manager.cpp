@@ -71,9 +71,9 @@ std::string GpioManager::processGpioAllModes(std::string &payload) {
 
   /* Simulation only supports reading port A and B */
   for (uint8_t i = 0U; i < static_cast<uint8_t>(Datagram::Gpio::Port::NUM_GPIO_PORTS) * Datagram::Gpio::PINS_PER_PORT; i++) {
-    size_t blockIndex = (i / 8U); /* 4 bits per pin so there is only 8 pins per block */
+    size_t blockIndex = (i / 8U);       /* 4 bits per pin so there is only 8 pins per block */
     size_t bitPosition = (i % 8U) * 4U; /* Multiply by 4 to account for 4 bits per pin */
-    
+
     GpioMode pinMode = gpio_peek_mode(static_cast<GpioPort>(i / 16U), i % 16U);
 
     gpioStateBitsetArray[blockIndex] &= ~(0xFU << bitPosition);

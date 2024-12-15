@@ -17,7 +17,7 @@ class GpioManager {
   Datagram::Gpio m_gpioDatagram;
 
   std::string stringifyPinMode(Datagram::Gpio::Mode mode);
-  
+
   void loadGpioInfo(std::string &projectName);
   void saveGpioInfo(std::string &projectName);
 
