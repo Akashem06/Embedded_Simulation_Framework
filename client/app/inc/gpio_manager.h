@@ -20,6 +20,9 @@ class GpioManager {
 
   std::string processGpioPinMode(std::string &payload);
   std::string processGpioAllModes(std::string &payload);
+
+  std::string processGpioPinAltFunction(std::string &payload);
+  std::string processGpioAllAltFunctions(std::string &payload);
 };
 
 #endif

@@ -46,7 +46,12 @@ void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &mes
       serverGpioManager.updateGpioAllModes(clientName, payload);
       break;
     }
-    case CommandCode::GPIO_GET_ALT_FUNCTION: {
+    case CommandCode::GPIO_GET_PIN_ALT_FUNCTION: {
+      serverGpioManager.updateGpioPinAltFunction(clientName, payload);
+      break;
+    }
+    case CommandCode::GPIO_GET_ALL_ALT_FUNCTIONS: {
+      serverGpioManager.updateGpioAllAltFunctions(clientName, payload);
       break;
     }
     default: {

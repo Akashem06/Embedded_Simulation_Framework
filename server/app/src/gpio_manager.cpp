@@ -59,6 +59,55 @@ std::string GpioManager::stringifyPinMode(Datagram::Gpio::Mode mode) {
   return result;
 }
 
+std::string GpioManager::stringifyPinAltFunction(Datagram::Gpio::AltFunction altFunction) {
+  std::string result = "";
+
+  switch (altFunction) {
+    /* Duplicate value is SWCLK/SWDIO */
+    case Datagram::Gpio::AltFunction::GPIO_ALT_NONE: {
+      result = "None/SWDIO/SWCLK ALT0";
+      break;
+    }
+    /* Duplicate value is Timer 2 */
+    case Datagram::Gpio::AltFunction::GPIO_ALT1_TIM1: {
+      result = "Timer1/2 ALT1";
+      break;
+    }
+    /* Duplicate values is I2C2/3 */
+    case Datagram::Gpio::AltFunction::GPIO_ALT4_I2C1: {
+      result = "I2C1/2/3 ALT4";
+      break;
+    }
+    /* Duplicate value is SPI2 */
+    case Datagram::Gpio::AltFunction::GPIO_ALT5_SPI1: {
+      result = "SPI1/2 ALT5";
+      break;
+    }
+    case Datagram::Gpio::AltFunction::GPIO_ALT6_SPI3: {
+      result = "SPI3 ALT6";
+      break;
+    }
+    case Datagram::Gpio::AltFunction::GPIO_ALT7_USART1: {
+      result = "USART1/2/3 ALT7";
+      break;
+    }
+    case Datagram::Gpio::AltFunction::GPIO_ALT9_CAN1: {
+      result = "CAN1 ALT9";
+      break;
+    }
+    /* Duplicate value is Timer 16 */
+    case Datagram::Gpio::AltFunction::GPIO_ALT14_TIM15: {
+      result = "TIMER15/16 ALT14";
+      break;
+    }
+    default: {
+      result = "Invalid Alternate Function";
+    }
+  }
+
+  return result;
+}
+
 void GpioManager::loadGpioInfo(std::string &projectName) {
   m_gpioInfo = globalJSON.getProjectValue<std::unordered_map<std::string, GpioManager::PinInfo>>(projectName, "Gpio Info");
 }
@@ -151,11 +200,49 @@ void GpioManager::updateGpioAllModes(std::string &projectName, std::string &payl
   saveGpioInfo(projectName);
 }
 
+void GpioManager::updateGpioPinAltFunction(std::string &projectName, std::string &payload) {
+  loadGpioInfo(projectName);
+
+  m_gpioDatagram.deserialize(payload);
+
+  std::string key = gpioPortNames[static_cast<uint8_t>(m_gpioDatagram.getGpioPort())];
+  key += std::to_string(m_gpioDatagram.getGpioPin());
+
+  const uint8_t *receivedData = m_gpioDatagram.getBuffer();
+
+  m_gpioInfo[key][PIN_ALT_FUNC_KEY] = stringifyPinAltFunction(static_cast<Datagram::Gpio::AltFunction>(receivedData[0U]));
+
+  saveGpioInfo(projectName);
+}
+
+void GpioManager::updateGpioAllAltFunctions(std::string &projectName, std::string &payload) {
+  loadGpioInfo(projectName);
+
+  m_gpioDatagram.deserialize(payload);
+
+  const uint32_t *receivedData = reinterpret_cast<const uint32_t *>(m_gpioDatagram.getBuffer());
+
+  for (uint8_t i = 0U; i < static_cast<uint8_t>(Datagram::Gpio::Port::NUM_GPIO_PORTS) * static_cast<uint8_t>(Datagram::Gpio::PINS_PER_PORT); i++) {
+    size_t blockIndex = (i / 8U);     /* 4 bits per pin so there is only 8 pins per block */
+    size_t bitOffset = (i % 8U) * 4U; /* Multiply by 4 because each each mode is 4 bit */
+
+    uint8_t pinAltFunction = (receivedData[blockIndex] >> bitOffset) & 0x0F;
+
+    std::string key = gpioPortNames[i / Datagram::Gpio::PINS_PER_PORT];
+    key += std::to_string(i % Datagram::Gpio::PINS_PER_PORT);
+
+    m_gpioInfo[key][PIN_ALT_FUNC_KEY] = stringifyPinAltFunction(static_cast<Datagram::Gpio::AltFunction>(pinAltFunction));
+  }
+
+  saveGpioInfo(projectName);
+}
+
 std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string &gpioPortPin, std::string data) {
   try {
     switch (commandCode) {
+      case CommandCode::GPIO_GET_PIN_STATE:
       case CommandCode::GPIO_GET_PIN_MODE:
-      case CommandCode::GPIO_GET_PIN_STATE: {
+      case CommandCode::GPIO_GET_PIN_ALT_FUNCTION: {
         if (gpioPortPin.empty() || gpioPortPin.size() < 2) {
           throw std::runtime_error(
               "Invalid format for port/pin specification. Good examples: 'A9' "
@@ -179,8 +266,9 @@ std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string 
         break;
       }
 
+      case CommandCode::GPIO_GET_ALL_STATES:
       case CommandCode::GPIO_GET_ALL_MODES:
-      case CommandCode::GPIO_GET_ALL_STATES: {
+      case CommandCode::GPIO_GET_ALL_ALT_FUNCTIONS: {
         m_gpioDatagram.setGpioPort(Datagram::Gpio::Port::NUM_GPIO_PORTS);
         m_gpioDatagram.setGpioPin(Datagram::Gpio::PINS_PER_PORT);
         m_gpioDatagram.setBuffer(nullptr, 0U);

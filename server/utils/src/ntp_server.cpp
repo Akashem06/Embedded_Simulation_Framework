@@ -23,7 +23,8 @@ bool NTPServer::queryNTPServer(NTPPacket &response) {
   }
 
   NTPPacket request = {};
-  request.flags = (NTP_VERSION << NTP_VERSION_OFFSET) | (NTPLeapIndicator::NTP_LI_NOSYNC << NTP_LEAP_INDICATOR_OFFSET) | (NTPMode::NTP_CLIENT_MODE << NTP_MODE_OFFSET);
+  request.flags = (NTP_VERSION << NTP_VERSION_OFFSET) | (NTPLeapIndicator::NTP_LI_NOSYNC << NTP_LEAP_INDICATOR_OFFSET) |
+                  (NTPMode::NTP_CLIENT_MODE << NTP_MODE_OFFSET);
 
   auto now = std::chrono::system_clock::now();
   auto duration = now.time_since_epoch();
@@ -68,7 +69,8 @@ bool NTPServer::queryNTPServer(NTPPacket &response) {
 
 NTPPacket NTPServer::processNTPRequest(const NTPPacket &request) {
   NTPPacket response = {};
-  response.flags = (NTP_VERSION << NTP_VERSION_OFFSET) | (NTPLeapIndicator::NTP_LI_NONE << NTP_LEAP_INDICATOR_OFFSET) | (NTPMode::NTP_SERVER_MODE << NTP_MODE_OFFSET);
+  response.flags = (NTP_VERSION << NTP_VERSION_OFFSET) | (NTPLeapIndicator::NTP_LI_NONE << NTP_LEAP_INDICATOR_OFFSET) |
+                   (NTPMode::NTP_SERVER_MODE << NTP_MODE_OFFSET);
 
   response.stratum = 2U;
   response.poll = 4U;      /* 2^4 = 16 seconds between succesive messages. */

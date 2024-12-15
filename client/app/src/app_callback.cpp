@@ -27,7 +27,12 @@ std::string applicationMessageCallback(TCPClient *client, std::string &message) 
       client->sendMessage(clientGpioManager.processGpioAllModes(payload));
       break;
     }
-    case CommandCode::GPIO_GET_ALT_FUNCTION: {
+    case CommandCode::GPIO_GET_PIN_ALT_FUNCTION: {
+      client->sendMessage(clientGpioManager.processGpioPinAltFunction(payload));
+      break;
+    }
+    case CommandCode::GPIO_GET_ALL_ALT_FUNCTIONS: {
+      client->sendMessage(clientGpioManager.processGpioAllAltFunctions(payload));
       break;
     }
     default: {

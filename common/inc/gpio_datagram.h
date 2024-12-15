@@ -30,6 +30,43 @@ class Gpio {
     NUM_GPIO_MODES,
   };
 
+  enum class AltFunction {
+    // No ALT function
+    GPIO_ALT_NONE = 0x00U,
+
+    // GPIO_ALT0 - System
+    GPIO_ALT0_SWDIO = 0x00U,
+    GPIO_ALT0_SWCLK = 0x00U,
+
+    // GPIO_ALT1 - TIM1/TIM2
+    GPIO_ALT1_TIM1 = 0x01U,
+    GPIO_ALT1_TIM2 = 0x01U,
+
+    // GPIO_ALT4 - I2C
+    GPIO_ALT4_I2C1 = 0x04U,
+    GPIO_ALT4_I2C2 = 0x04U,
+    GPIO_ALT4_I2C3 = 0x04U,
+
+    // GPIO_ALT5 - SPI
+    GPIO_ALT5_SPI1 = 0x05U,
+    GPIO_ALT5_SPI2 = 0x05U,
+
+    // GPIO_ALT6 - SPI3
+    GPIO_ALT6_SPI3 = 0x06U,
+
+    // GPIO_ALT7 - USART
+    GPIO_ALT7_USART1 = 0x07U,
+    GPIO_ALT7_USART2 = 0x07U,
+    GPIO_ALT7_USART3 = 0x07U,
+
+    // GPIO_ALT9 - CAN1
+    GPIO_ALT9_CAN1 = 0x09U,
+
+    // GPIO_ALT14 - Timers
+    GPIO_ALT14_TIM15 = 0x0EU,
+    GPIO_ALT14_TIM16 = 0x0EU,
+  };
+
   static constexpr size_t GPIO_MAX_BUFFER_SIZE = PINS_PER_PORT * static_cast<uint8_t>(Port::NUM_GPIO_PORTS);
 
   struct Payload {

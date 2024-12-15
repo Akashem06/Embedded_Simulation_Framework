@@ -3,130 +3,162 @@
     "Default Project": {
       "Gpio Info": {
         "A0": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "A1": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Floating Input",
           "State": "HIGH"
         },
         "A10": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Analog",
           "State": "LOW"
         },
         "A11": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "A12": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "A13": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "A14": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "A15": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "A2": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Analog",
           "State": "LOW"
         },
         "A3": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "A4": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "A5": {
+          "Alternate Function": "CAN1 ALT9",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "A6": {
+          "Alternate Function": "TIMER15/16 ALT14",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "A7": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "A8": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "A9": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Floating Input",
           "State": "HIGH"
         },
         "B0": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "B1": {
+          "Alternate Function": "CAN1 ALT9",
           "Mode": "Floating Input",
           "State": "HIGH"
         },
         "B10": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "LOW"
         },
         "B11": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "B12": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "B13": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "B14": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "B15": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "B2": {
+          "Alternate Function": "TIMER15/16 ALT14",
           "Mode": "Analog",
           "State": "LOW"
         },
         "B3": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "B4": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "B5": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "B6": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "B7": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "B8": {
+          "Alternate Function": "CAN1 ALT9",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "B9": {
+          "Alternate Function": "TIMER15/16 ALT14",
           "Mode": "Floating Input",
           "State": "HIGH"
         }
@@ -139,130 +171,162 @@
     "Default Project (1)": {
       "Gpio Info": {
         "A0": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "A1": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Floating Input",
           "State": "HIGH"
         },
         "A10": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Analog",
           "State": "LOW"
         },
         "A11": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "A12": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "A13": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "A14": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "A15": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "A2": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Analog",
           "State": "LOW"
         },
         "A3": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "A4": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "A5": {
+          "Alternate Function": "CAN1 ALT9",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "A6": {
+          "Alternate Function": "TIMER15/16 ALT14",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "A7": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "A8": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "A9": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Floating Input",
           "State": "HIGH"
         },
         "B0": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "B1": {
+          "Alternate Function": "CAN1 ALT9",
           "Mode": "Floating Input",
           "State": "HIGH"
         },
         "B10": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "LOW"
         },
         "B11": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "B12": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "B13": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "B14": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "B15": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "B2": {
+          "Alternate Function": "TIMER15/16 ALT14",
           "Mode": "Analog",
           "State": "LOW"
         },
         "B3": {
+          "Alternate Function": "None/SWDIO/SWCLK ALT0",
           "Mode": "Pull-up Input",
           "State": "HIGH"
         },
         "B4": {
+          "Alternate Function": "Timer1/2 ALT1",
           "Mode": "Open-drain Output",
           "State": "LOW"
         },
         "B5": {
+          "Alternate Function": "I2C1/2/3 ALT4",
           "Mode": "Push-pull Alternate Function",
           "State": "HIGH"
         },
         "B6": {
+          "Alternate Function": "SPI1/2 ALT5",
           "Mode": "Pull-down Input",
           "State": "LOW"
         },
         "B7": {
+          "Alternate Function": "USART1/2/3 ALT7",
           "Mode": "Analog",
           "State": "HIGH"
         },
         "B8": {
+          "Alternate Function": "CAN1 ALT9",
           "Mode": "Push-pull Output",
           "State": "LOW"
         },
         "B9": {
+          "Alternate Function": "TIMER15/16 ALT14",
           "Mode": "Floating Input",
           "State": "HIGH"
         }

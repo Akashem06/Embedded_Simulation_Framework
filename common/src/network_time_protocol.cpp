@@ -25,7 +25,8 @@ void dumpNTPPacketData(const NTPPacket packet) {
 
   const char *leapStrings[] = {"No warning", "Last minute has 61 seconds", "Last minute has 59 seconds", "Alarm: clock not synchronized"};
 
-  const char *modeStrings[] = {"Reserved", "Symmetric Active", "Symmetric Passive", "Client", "Server", "Broadcast", "NTP Control Message", "Private Use"};
+  const char *modeStrings[] = {"Reserved", "Symmetric Active", "Symmetric Passive",   "Client",
+                               "Server",   "Broadcast",        "NTP Control Message", "Private Use"};
 
   std::cout << "NTP Packet Dump:" << std::endl;
   std::cout << "----------------" << std::endl;
@@ -58,13 +59,17 @@ void dumpNTPPacketData(const NTPPacket packet) {
     return std::string(buffer);
   };
 
-  std::cout << "Reference Time: " << formatTimestamp(packet.referenceTime) << " (Seconds: " << packet.referenceTime.seconds << ", Fraction: " << packet.referenceTime.fraction << ")" << std::endl;
+  std::cout << "Reference Time: " << formatTimestamp(packet.referenceTime) << " (Seconds: " << packet.referenceTime.seconds
+            << ", Fraction: " << packet.referenceTime.fraction << ")" << std::endl;
 
-  std::cout << "Origin Time:    " << formatTimestamp(packet.originTime) << " (Seconds: " << packet.originTime.seconds << ", Fraction: " << packet.originTime.fraction << ")" << std::endl;
+  std::cout << "Origin Time:    " << formatTimestamp(packet.originTime) << " (Seconds: " << packet.originTime.seconds
+            << ", Fraction: " << packet.originTime.fraction << ")" << std::endl;
 
-  std::cout << "Receive Time:   " << formatTimestamp(packet.receiveTime) << " (Seconds: " << packet.receiveTime.seconds << ", Fraction: " << packet.receiveTime.fraction << ")" << std::endl;
+  std::cout << "Receive Time:   " << formatTimestamp(packet.receiveTime) << " (Seconds: " << packet.receiveTime.seconds
+            << ", Fraction: " << packet.receiveTime.fraction << ")" << std::endl;
 
-  std::cout << "Transmit Time:  " << formatTimestamp(packet.transmitTime) << " (Seconds: " << packet.transmitTime.seconds << ", Fraction: " << packet.transmitTime.fraction << ")" << std::endl;
+  std::cout << "Transmit Time:  " << formatTimestamp(packet.transmitTime) << " (Seconds: " << packet.transmitTime.seconds
+            << ", Fraction: " << packet.transmitTime.fraction << ")" << std::endl;
 
   std::cout << "Poll Interval:  " << static_cast<int>(packet.poll) << " (2^" << static_cast<int>(packet.poll) << " seconds)" << std::endl;
 
