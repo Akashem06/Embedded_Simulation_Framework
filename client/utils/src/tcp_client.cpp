@@ -30,16 +30,10 @@ void TCPClient::processMessages() {
       auto message = m_messageQueue.front();
       m_messageQueue.pop();
 
-      pthread_mutex_unlock(&m_mutex);
-
       if (m_messageCallback) {
-        std::string response = m_messageCallback(this, message);
-        if (!response.empty()) {
-          sendMessage(response);
-        }
-      } else {
-        pthread_mutex_unlock(&m_mutex);
+        m_messageCallback(this, message);
       }
+      pthread_mutex_unlock(&m_mutex);
     }
   }
 }

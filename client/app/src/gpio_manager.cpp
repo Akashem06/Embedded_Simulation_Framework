@@ -9,10 +9,31 @@ extern "C" {
 #include "command_code.h"
 #include "gpio_manager.h"
 
+void GpioManager::setGpioPinState(std::string &payload) {
+  m_gpioDatagram.deserialize(payload);
+
+  const uint8_t *receivedData = m_gpioDatagram.getBuffer();
+  GpioAddress pinAddress = {.port = static_cast<GpioPort>(m_gpioDatagram.getGpioPort()), .pin = m_gpioDatagram.getGpioPin()};
+
+  gpio_set_state(&pinAddress, static_cast<GpioState>(receivedData[0U]));
+}
+
+void GpioManager::setGpioAllStates(std::string &payload) {
+  m_gpioDatagram.deserialize(payload);
+
+  const uint8_t *receivedData = m_gpioDatagram.getBuffer();
+
+  for (uint8_t i = 0U; i < static_cast<uint8_t>(Datagram::Gpio::Port::NUM_GPIO_PORTS) * Datagram::Gpio::PINS_PER_PORT; i++) {
+    GpioAddress pinAddress = {.port = static_cast<GpioPort>(i / 16U), .pin = i % 16U};
+    gpio_set_state(&pinAddress, static_cast<GpioState>(receivedData[0U]));
+  }
+}
+
 std::string GpioManager::processGpioPinState(std::string &payload) {
   m_gpioDatagram.deserialize(payload);
 
-  uint8_t pinState = static_cast<uint8_t>(gpio_peek_state(static_cast<GpioPort>(m_gpioDatagram.getGpioPort()), m_gpioDatagram.getGpioPin()));
+  GpioAddress pinAddress = {.port = static_cast<GpioPort>(m_gpioDatagram.getGpioPort()), .pin = m_gpioDatagram.getGpioPin()};
+  uint8_t pinState = static_cast<uint8_t>(gpio_peek_state(&pinAddress));
 
   m_gpioDatagram.clearBuffer();
   m_gpioDatagram.setBuffer(&pinState, sizeof(pinState));
@@ -20,7 +41,7 @@ std::string GpioManager::processGpioPinState(std::string &payload) {
   return m_gpioDatagram.serialize(CommandCode::GPIO_GET_PIN_STATE);
 }
 
-std::string GpioManager::processGpioAllStates(std::string &payload) {
+std::string GpioManager::processGpioAllStates() {
   std::vector<uint32_t> gpioStateBitsetArray;
 
   /* Round up the number of blocks by adding the divisor - 1 */
@@ -31,7 +52,8 @@ std::string GpioManager::processGpioAllStates(std::string &payload) {
   for (uint8_t i = 0U; i < static_cast<uint8_t>(Datagram::Gpio::Port::NUM_GPIO_PORTS) * Datagram::Gpio::PINS_PER_PORT; i++) {
     size_t blockIndex = i / 32U;
     size_t bitPosition = i % 32U;
-    GpioState pinState = gpio_peek_state(static_cast<GpioPort>(i / 16U), i % 16U);
+    GpioAddress pinAddress = {.port = static_cast<GpioPort>(i / 16U), .pin = i % 16U};
+    GpioState pinState = gpio_peek_state(&pinAddress);
     gpioStateBitsetArray[blockIndex] |= (static_cast<uint32_t>(pinState << bitPosition));
   }
   m_gpioDatagram.setGpioPort(Datagram::Gpio::Port::NUM_GPIO_PORTS);
@@ -54,7 +76,8 @@ std::string GpioManager::processGpioAllStates(std::string &payload) {
 std::string GpioManager::processGpioPinMode(std::string &payload) {
   m_gpioDatagram.deserialize(payload);
 
-  uint8_t pinMode = static_cast<uint8_t>(gpio_peek_mode(static_cast<GpioPort>(m_gpioDatagram.getGpioPort()), m_gpioDatagram.getGpioPin()));
+  GpioAddress pinAddress = {.port = static_cast<GpioPort>(m_gpioDatagram.getGpioPort()), .pin = m_gpioDatagram.getGpioPin()};
+  uint8_t pinMode = static_cast<uint8_t>(gpio_peek_mode(&pinAddress));
 
   m_gpioDatagram.clearBuffer();
   m_gpioDatagram.setBuffer(&pinMode, sizeof(pinMode));
@@ -62,7 +85,7 @@ std::string GpioManager::processGpioPinMode(std::string &payload) {
   return m_gpioDatagram.serialize(CommandCode::GPIO_GET_PIN_MODE);
 }
 
-std::string GpioManager::processGpioAllModes(std::string &payload) {
+std::string GpioManager::processGpioAllModes() {
   std::vector<uint32_t> gpioStateBitsetArray;
 
   /* Calculate number of 32-bit blocks needed (8 pins per 32-bit block with 4 bits per pin) */
@@ -74,7 +97,8 @@ std::string GpioManager::processGpioAllModes(std::string &payload) {
     size_t blockIndex = (i / 8U);       /* 4 bits per pin so there is only 8 pins per block */
     size_t bitPosition = (i % 8U) * 4U; /* Multiply by 4 to account for 4 bits per pin */
 
-    GpioMode pinMode = gpio_peek_mode(static_cast<GpioPort>(i / 16U), i % 16U);
+    GpioAddress pinAddress = {.port = static_cast<GpioPort>(i / 16U), .pin = i % 16U};
+    GpioMode pinMode = gpio_peek_mode(&pinAddress);
 
     gpioStateBitsetArray[blockIndex] &= ~(0xFU << bitPosition);
     gpioStateBitsetArray[blockIndex] |= (static_cast<uint32_t>(pinMode) << bitPosition);
@@ -100,8 +124,8 @@ std::string GpioManager::processGpioAllModes(std::string &payload) {
 std::string GpioManager::processGpioPinAltFunction(std::string &payload) {
   m_gpioDatagram.deserialize(payload);
 
-  uint8_t pinAltFunction =
-      static_cast<uint8_t>(gpio_peek_alt_function(static_cast<GpioPort>(m_gpioDatagram.getGpioPort()), m_gpioDatagram.getGpioPin()));
+  GpioAddress pinAddress = {.port = static_cast<GpioPort>(m_gpioDatagram.getGpioPort()), .pin = m_gpioDatagram.getGpioPin()};
+  uint8_t pinAltFunction = static_cast<uint8_t>(gpio_peek_alt_function(&pinAddress));
 
   m_gpioDatagram.clearBuffer();
   m_gpioDatagram.setBuffer(&pinAltFunction, sizeof(pinAltFunction));
@@ -109,7 +133,7 @@ std::string GpioManager::processGpioPinAltFunction(std::string &payload) {
   return m_gpioDatagram.serialize(CommandCode::GPIO_GET_PIN_ALT_FUNCTION);
 }
 
-std::string GpioManager::processGpioAllAltFunctions(std::string &payload) {
+std::string GpioManager::processGpioAllAltFunctions() {
   std::vector<uint32_t> gpioAltFunctionBitsetArray;
 
   /* Calculate number of 32-bit blocks needed (8 pins per 32-bit block with 4 bits per pin) */
@@ -121,7 +145,8 @@ std::string GpioManager::processGpioAllAltFunctions(std::string &payload) {
     size_t blockIndex = (i / 8U);       /* 4 bits per pin so there is only 8 pins per block */
     size_t bitPosition = (i % 8U) * 4U; /* Multiply by 4 to account for 4 bits per pin */
 
-    GpioAlternateFunctions pinFunction = gpio_peek_alt_function(static_cast<GpioPort>(i / 16U), i % 16U);
+    GpioAddress pinAddress = {.port = static_cast<GpioPort>(i / 16U), .pin = i % 16U};
+    GpioAlternateFunctions pinFunction = gpio_peek_alt_function(&pinAddress);
 
     gpioAltFunctionBitsetArray[blockIndex] &= ~(0xFU << bitPosition);
     gpioAltFunctionBitsetArray[blockIndex] |= (static_cast<uint32_t>(pinFunction) << bitPosition);

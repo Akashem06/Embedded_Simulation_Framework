@@ -8,7 +8,8 @@ enum class CommandCode {
   METADATA,
 
   /* GPIO Commands */
-  GPIO_SET_STATE,
+  GPIO_SET_PIN_STATE,
+  GPIO_SET_ALL_STATES,
   GPIO_GET_PIN_STATE,
   GPIO_GET_ALL_STATES,
   GPIO_GET_PIN_MODE,

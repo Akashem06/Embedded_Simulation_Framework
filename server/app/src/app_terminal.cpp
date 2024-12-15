@@ -32,7 +32,10 @@ void Terminal::handleGpioCommands(const std::string &action, std::vector<std::st
     message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_PIN_ALT_FUNCTION, tokens[2], "");
   } else if (action == "get_all_alt_functions" && tokens.size() >= 2) {
     message = serverGpioManager.createGpioCommand(CommandCode::GPIO_GET_ALL_ALT_FUNCTIONS, tokens[0], "");
-  } else if (action == "set_state" && tokens.size() >= 4) {
+  } else if (action == "set_pin_state" && tokens.size() >= 4) {
+    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_SET_PIN_STATE, tokens[2], tokens[3]);
+  } else if (action == "set_all_states" && tokens.size() >= 3) {
+    message = serverGpioManager.createGpioCommand(CommandCode::GPIO_SET_ALL_STATES, tokens[0], tokens[2]);
   } else {
     std::cerr << "Unsupported action: " << action << std::endl;
   }

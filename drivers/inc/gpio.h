@@ -88,9 +88,15 @@ typedef enum {
 
 #define GPIO_TOTAL_PINS ((GPIO_PINS_PER_PORT) * (NUM_GPIO_PORTS))
 
-GpioMode gpio_peek_mode(GpioPort port, uint8_t pin);
-GpioState gpio_peek_state(GpioPort port, uint8_t pin);
-GpioAlternateFunctions gpio_peek_alt_function(GpioPort port, uint8_t pin);
+typedef struct GpioAddress {
+  GpioPort port;
+  uint8_t pin;
+} GpioAddress;
+
+GpioMode gpio_peek_mode(GpioAddress *address);
+GpioState gpio_peek_state(GpioAddress *address);
+GpioAlternateFunctions gpio_peek_alt_function(GpioAddress *address);
+void gpio_set_state(GpioAddress *address, GpioState state);
 
 #ifdef __cplusplus
 }

@@ -15,14 +15,17 @@ class GpioManager {
  public:
   GpioManager() = default;
 
+  void setGpioPinState(std::string &payload);
+  void setGpioAllStates(std::string &payload);
+
   std::string processGpioPinState(std::string &payload);
-  std::string processGpioAllStates(std::string &payload);
+  std::string processGpioAllStates();
 
   std::string processGpioPinMode(std::string &payload);
-  std::string processGpioAllModes(std::string &payload);
+  std::string processGpioAllModes();
 
   std::string processGpioPinAltFunction(std::string &payload);
-  std::string processGpioAllAltFunctions(std::string &payload);
+  std::string processGpioAllAltFunctions();
 };
 
 #endif

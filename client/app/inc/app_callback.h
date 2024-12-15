@@ -5,6 +5,6 @@
 
 #include "tcp_client.h"
 
-std::string applicationMessageCallback(TCPClient *client, std::string &message);
+void applicationMessageCallback(TCPClient *client, std::string &message);
 
 #endif

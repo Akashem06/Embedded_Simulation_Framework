@@ -247,6 +247,7 @@ std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string 
           throw std::runtime_error(
               "Invalid format for port/pin specification. Good examples: 'A9' "
               "'A12' 'B13'");
+          break;
         }
 
         Datagram::Gpio::Port port = static_cast<Datagram::Gpio::Port>(gpioPortPin[0] - 'A');
@@ -254,10 +255,12 @@ std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string 
 
         if (port >= Datagram::Gpio::Port::NUM_GPIO_PORTS) {
           throw std::runtime_error("Invalid selection for Gpio ports. Expected: A or B");
+          break;
         }
 
         if (pin >= Datagram::Gpio::PINS_PER_PORT) {
           throw std::runtime_error("Exceeded maximum number of Gpio pins: " + std::to_string(static_cast<int>(Datagram::Gpio::PINS_PER_PORT)));
+          break;
         }
 
         m_gpioDatagram.setGpioPort(port);
@@ -275,19 +278,58 @@ std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string 
         break;
       }
 
-      case CommandCode::GPIO_SET_STATE: {
-        uint8_t pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_LOW);
+      case CommandCode::GPIO_SET_PIN_STATE: {
+        if (gpioPortPin.empty() || gpioPortPin.size() < 2) {
+          throw std::runtime_error(
+              "Invalid format for port/pin specification. Good examples: 'A9' "
+              "'A12' 'B13'");
+          break;
+        }
+
+        Datagram::Gpio::Port port = static_cast<Datagram::Gpio::Port>(gpioPortPin[0] - 'A');
+        uint8_t pin = static_cast<uint8_t>(std::stoi(gpioPortPin.substr(1)));
+        uint8_t pinState;
+
+        if (port >= Datagram::Gpio::Port::NUM_GPIO_PORTS) {
+          throw std::runtime_error("Invalid selection for Gpio ports. Expected: A or B");
+          break;
+        }
+
+        if (pin >= Datagram::Gpio::PINS_PER_PORT) {
+          throw std::runtime_error("Exceeded maximum number of Gpio pins: " + std::to_string(static_cast<int>(Datagram::Gpio::PINS_PER_PORT)));
+          break;
+        }
+
         if (data == "HIGH") {
           pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_HIGH);
         } else if (data == "LOW") {
           pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_LOW);
         } else {
           throw std::runtime_error("Invalid Gpio state: " + data);
+          break;
         }
 
+        m_gpioDatagram.setGpioPort(port);
+        m_gpioDatagram.setGpioPin(pin);
         m_gpioDatagram.setBuffer(&pinState, sizeof(pinState));
 
         break;
+      }
+
+      case CommandCode::GPIO_SET_ALL_STATES: {
+        uint8_t pinState;
+        if (data == "HIGH") {
+          pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_HIGH);
+        } else if (data == "LOW") {
+          pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_LOW);
+        } else {
+          throw std::runtime_error("Invalid Gpio state: " + data);
+          break;
+        }
+
+        m_gpioDatagram.setGpioPort(Datagram::Gpio::Port::NUM_GPIO_PORTS);
+        m_gpioDatagram.setGpioPin(Datagram::Gpio::PINS_PER_PORT);
+        m_gpioDatagram.setBuffer(&pinState, sizeof(pinState));
       }
 
       default: {
