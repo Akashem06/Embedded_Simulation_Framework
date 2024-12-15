@@ -5,66 +5,157 @@
 #include "app.h"
 #include "command_code.h"
 
+
+#define PIN_STATE_KEY       "State"
+#define PIN_MODE_KEY        "Mode"
+#define PIN_ALT_FUNC_KEY    "Alternate Function"
+
 const char *gpioPortNames[] = {
     "A", /* GPIO_PORT_A */
     "B", /* GPIO_PORT_B */
 };
 
-void GpioManager::loadGpioStates(std::string &projectName) {
-  m_gpioStates = globalJSON.getProjectValue<std::unordered_map<std::string, std::string>>(projectName, "Gpio States");
+std::string GpioManager::stringifyPinMode(Datagram::Gpio::Mode mode) {
+  std::string result = "";
+
+  switch (mode) {
+    case Datagram::Gpio::Mode::GPIO_ANALOG: {
+      result = "Analog";
+      break;
+    }
+    case Datagram::Gpio::Mode::GPIO_INPUT_FLOATING: {
+      result = "Floating Input";
+      break;
+    }
+    case Datagram::Gpio::Mode::GPIO_INPUT_PULL_DOWN: {
+      result = "Pull-down Input";
+      break;
+    }
+    case Datagram::Gpio::Mode::GPIO_INPUT_PULL_UP: {
+      result = "Pull-up Input";
+      break;
+    }
+    case Datagram::Gpio::Mode::GPIO_OUTPUT_OPEN_DRAIN: {
+      result = "Open-drain Output";
+      break;
+    }
+    case Datagram::Gpio::Mode::GPIO_OUTPUT_PUSH_PULL: {
+      result = "Push-pull Output";
+      break;
+    }
+    case Datagram::Gpio::Mode::GPIO_ALFTN_OPEN_DRAIN: {
+      result = "Open-drain Alternate Function";
+      break;
+    }
+    case Datagram::Gpio::Mode::GPIO_ALTFN_PUSH_PULL: {
+      result = "Push-pull Alternate Function";
+      break;
+    }
+    default: {
+      result = "Invalid Mode";
+      break;
+    }
+  }
+
+  return result;
 }
 
-void GpioManager::loadGpioModes(std::string &projectName) {
-  m_gpioModes = globalJSON.getProjectValue<std::unordered_map<std::string, Datagram::Gpio::Mode>>(projectName, "Gpio Modes");
+void GpioManager::loadGpioInfo(std::string &projectName) {
+  m_gpioInfo = globalJSON.getProjectValue<std::unordered_map<std::string, GpioManager::PinInfo>>(projectName, "Gpio Info");
+}
+
+void GpioManager::saveGpioInfo(std::string &projectName) {
+  globalJSON.setProjectValue(projectName, "Gpio Info", m_gpioInfo);
+
+  /* Upon save, clear the memory */
+  m_gpioInfo.clear();
 }
 
 void GpioManager::updateGpioPinState(std::string &projectName, std::string &payload) {
-  loadGpioStates(projectName);
+  loadGpioInfo(projectName);
 
   m_gpioDatagram.deserialize(payload);
 
   std::string key = gpioPortNames[static_cast<uint8_t>(m_gpioDatagram.getGpioPort())];
   key += std::to_string(m_gpioDatagram.getGpioPin());
-  Datagram::Gpio::State receivedPinState = static_cast<Datagram::Gpio::State>(m_gpioDatagram.getData());
+  const uint8_t *receivedData = m_gpioDatagram.getBuffer();
 
-  if (receivedPinState == Datagram::Gpio::State::GPIO_STATE_HIGH) {
-    m_gpioStates[key] = "HIGH";
-  } else if (receivedPinState == Datagram::Gpio::State::GPIO_STATE_LOW) {
-    m_gpioStates[key] = "LOW";
+  if (static_cast<Datagram::Gpio::State>(receivedData[0U]) == Datagram::Gpio::State::GPIO_STATE_HIGH) {
+    m_gpioInfo[key][PIN_STATE_KEY] = "HIGH";
+  } else if (static_cast<Datagram::Gpio::State>(receivedData[0U]) == Datagram::Gpio::State::GPIO_STATE_LOW) {
+    m_gpioInfo[key][PIN_STATE_KEY] = "LOW";
   } else {
-    m_gpioStates[key] = "INVALID";
+    m_gpioInfo[key][PIN_STATE_KEY] = "INVALID";
   }
 
-  globalJSON.setProjectValue(projectName, "Gpio States", m_gpioStates);
+  saveGpioInfo(projectName);
 }
 
 void GpioManager::updateGpioAllStates(std::string &projectName, std::string &payload) {
-  loadGpioStates(projectName);
+  loadGpioInfo(projectName);
 
   m_gpioDatagram.deserialize(payload);
 
-  uint32_t receivedData = static_cast<uint32_t>(m_gpioDatagram.getData());
+  const uint8_t *receivedData = m_gpioDatagram.getBuffer();
 
   for (uint8_t i = 0U; i < static_cast<uint8_t>(Datagram::Gpio::Port::NUM_GPIO_PORTS) * static_cast<uint8_t>(Datagram::Gpio::PINS_PER_PORT); i++) {
-    bool pinState = (receivedData & (1U << i)) != 0;
+    size_t blockIndex = i / 8U;
+    size_t bitPosition = i % 8U;
+    bool pinState = (receivedData[blockIndex] & (1U << bitPosition)) != 0;
     std::string key = gpioPortNames[i / Datagram::Gpio::PINS_PER_PORT];
     key += std::to_string(i % Datagram::Gpio::PINS_PER_PORT);
 
     if (pinState) {
-      m_gpioStates[key] = "HIGH";
+      m_gpioInfo[key][PIN_STATE_KEY] = "HIGH";
     } else {
-      m_gpioStates[key] = "LOW";
+      m_gpioInfo[key][PIN_STATE_KEY] = "LOW";
     }
   }
 
-  globalJSON.setProjectValue(projectName, "Gpio States", m_gpioStates);
+  saveGpioInfo(projectName);
 }
 
-void GpioManager::updateGpioModes(std::string &projectName, std::string &payload) {}
+void GpioManager::updateGpioPinMode(std::string &projectName, std::string &payload) {
+  loadGpioInfo(projectName);
+
+  m_gpioDatagram.deserialize(payload);
+
+  std::string key = gpioPortNames[static_cast<uint8_t>(m_gpioDatagram.getGpioPort())];
+  key += std::to_string(m_gpioDatagram.getGpioPin());
+
+  const uint8_t *receivedData = m_gpioDatagram.getBuffer();
+
+  m_gpioInfo[key][PIN_MODE_KEY] = stringifyPinMode(static_cast<Datagram::Gpio::Mode>(receivedData[0U]));
+
+  saveGpioInfo(projectName);
+}
+
+void GpioManager::updateGpioAllModes(std::string &projectName, std::string &payload) {
+  loadGpioInfo(projectName);
+
+  m_gpioDatagram.deserialize(payload);
+
+  const uint32_t *receivedData = reinterpret_cast<const uint32_t*>(m_gpioDatagram.getBuffer());
+
+  for (uint8_t i = 0U; i < static_cast<uint8_t>(Datagram::Gpio::Port::NUM_GPIO_PORTS) * static_cast<uint8_t>(Datagram::Gpio::PINS_PER_PORT); i++) {
+    size_t blockIndex = (i / 8U); /* 4 bits per pin so there is only 8 pins per block */
+    size_t bitOffset = (i % 8U) * 4U;   /* Multiply by 4 because each each mode is 4 bit */
+    
+    uint8_t pinMode = (receivedData[blockIndex] >> bitOffset) & 0x0F;
+    
+    std::string key = gpioPortNames[i / Datagram::Gpio::PINS_PER_PORT];
+    key += std::to_string(i % Datagram::Gpio::PINS_PER_PORT);
+
+    m_gpioInfo[key][PIN_MODE_KEY] = stringifyPinMode(static_cast<Datagram::Gpio::Mode>(pinMode));
+  }
+
+  saveGpioInfo(projectName);
+}
 
 std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string &gpioPortPin, std::string data) {
   try {
     switch (commandCode) {
+      case CommandCode::GPIO_GET_PIN_MODE:
       case CommandCode::GPIO_GET_PIN_STATE: {
         if (gpioPortPin.empty() || gpioPortPin.size() < 2) {
           throw std::runtime_error(
@@ -85,25 +176,29 @@ std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string 
 
         m_gpioDatagram.setGpioPort(port);
         m_gpioDatagram.setGpioPin(pin);
-        m_gpioDatagram.setData(UINT32_MAX);
+        m_gpioDatagram.setBuffer(nullptr, 0U);
         break;
       }
 
+      case CommandCode::GPIO_GET_ALL_MODES:
       case CommandCode::GPIO_GET_ALL_STATES: {
         m_gpioDatagram.setGpioPort(Datagram::Gpio::Port::NUM_GPIO_PORTS);
         m_gpioDatagram.setGpioPin(Datagram::Gpio::PINS_PER_PORT);
-        m_gpioDatagram.setData(UINT32_MAX);
+        m_gpioDatagram.setBuffer(nullptr, 0U);
         break;
       }
 
       case CommandCode::GPIO_SET_STATE: {
+        uint8_t pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_LOW);
         if (data == "HIGH") {
-          m_gpioDatagram.setData(static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_HIGH));
+          pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_HIGH);
         } else if (data == "LOW") {
-          m_gpioDatagram.setData(static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_LOW));
+          pinState = static_cast<uint8_t>(Datagram::Gpio::State::GPIO_STATE_LOW);
         } else {
           throw std::runtime_error("Invalid Gpio state: " + data);
         }
+
+        m_gpioDatagram.setBuffer(&pinState, sizeof(pinState));
 
         break;
       }

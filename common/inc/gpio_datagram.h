@@ -30,10 +30,13 @@ class Gpio {
     NUM_GPIO_MODES,
   };
 
+  static constexpr size_t GPIO_MAX_BUFFER_SIZE = PINS_PER_PORT * static_cast<uint8_t>(Port::NUM_GPIO_PORTS);
+
   struct Payload {
     Port gpioPort;
     uint8_t gpioPin;
-    uint32_t data;
+    uint8_t bufferLength;
+    uint8_t buffer[GPIO_MAX_BUFFER_SIZE];
   };
 
   explicit Gpio(Payload &data);
@@ -44,11 +47,13 @@ class Gpio {
 
   void setGpioPort(const Port &gpioPort);
   void setGpioPin(const uint8_t &gpioPin);
-  void setData(const uint32_t &data);
+  void setBuffer(const uint8_t *data, uint8_t length);
+  void clearBuffer();
 
   Port getGpioPort() const;
   uint8_t getGpioPin() const;
-  uint32_t getData() const;
+  uint8_t getBufferLength() const;
+  const uint8_t *getBuffer() const;
 
  private:
   Payload m_gpioDatagram;

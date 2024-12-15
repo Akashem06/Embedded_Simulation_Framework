@@ -16,9 +16,10 @@ class GpioManager {
   GpioManager() = default;
 
   std::string processGpioPinState(std::string &payload);
-  std::string processGpioAllState(std::string &payload);
+  std::string processGpioAllStates(std::string &payload);
 
-//   std::string createGpioCommand(CommandCode commandCode, std::string &gpioPortPin, uint8_t data);
+  std::string processGpioPinMode(std::string &payload);
+  std::string processGpioAllModes(std::string &payload);
 };
 
 #endif

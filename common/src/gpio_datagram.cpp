@@ -12,7 +12,13 @@ std::string Gpio::serialize(const CommandCode &commandCode) const {
 
   serializeInteger<uint8_t>(serializedData, static_cast<uint8_t>(m_gpioDatagram.gpioPort));
   serializeInteger<uint8_t>(serializedData, static_cast<uint8_t>(m_gpioDatagram.gpioPin));
-  serializeInteger<uint32_t>(serializedData, m_gpioDatagram.data);
+
+  if (m_gpioDatagram.bufferLength > GPIO_MAX_BUFFER_SIZE) {
+    throw std::runtime_error("Serialized Gpio buffer length exceeds maximum allowed size");
+  }
+
+  serializeInteger<uint8_t>(serializedData, m_gpioDatagram.bufferLength);
+  serializedData.append(reinterpret_cast<const char *>(m_gpioDatagram.buffer), m_gpioDatagram.bufferLength);
   return encodeCommand(commandCode, serializedData);
 }
 
@@ -24,7 +30,13 @@ void Gpio::deserialize(std::string &gpioDatagramPayload) {
 
   m_gpioDatagram.gpioPort = static_cast<Port>(deserializeInteger<uint8_t>(gpioDatagramPayload, offset));
   m_gpioDatagram.gpioPin = deserializeInteger<uint8_t>(gpioDatagramPayload, offset);
-  m_gpioDatagram.data = deserializeInteger<uint32_t>(gpioDatagramPayload, offset);
+  m_gpioDatagram.bufferLength = deserializeInteger<uint8_t>(gpioDatagramPayload, offset);
+
+  if (m_gpioDatagram.bufferLength > GPIO_MAX_BUFFER_SIZE) {
+    throw std::runtime_error("Deserialized Gpio buffer length exceeds maximum allowed size");
+  }
+
+  std::memcpy(m_gpioDatagram.buffer, gpioDatagramPayload.data() + offset, m_gpioDatagram.bufferLength);
 }
 
 Gpio::Gpio(Payload &data) {
@@ -39,8 +51,13 @@ void Gpio::setGpioPin(const uint8_t &gpioPin) {
   m_gpioDatagram.gpioPin = gpioPin;
 }
 
-void Gpio::setData(const uint32_t &data) {
-  m_gpioDatagram.data = data;
+void Gpio::setBuffer(const uint8_t *data, uint8_t length) {
+  std::memcpy(m_gpioDatagram.buffer, data, length);
+  m_gpioDatagram.bufferLength = length;
+}
+
+void Gpio::clearBuffer() {
+  std::memset(m_gpioDatagram.buffer, 0U, GPIO_MAX_BUFFER_SIZE);
 }
 
 Gpio::Port Gpio::getGpioPort() const {
@@ -51,8 +68,12 @@ uint8_t Gpio::getGpioPin() const {
   return m_gpioDatagram.gpioPin;
 }
 
-uint32_t Gpio::getData() const {
-  return m_gpioDatagram.data;
+uint8_t Gpio::getBufferLength() const {
+  return m_gpioDatagram.bufferLength;
+}
+
+const uint8_t *Gpio::getBuffer() const {
+  return m_gpioDatagram.buffer;
 }
 
 }  // namespace Datagram

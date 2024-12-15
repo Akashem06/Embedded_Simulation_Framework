@@ -10,20 +10,24 @@
 
 class GpioManager {
  private:
-  std::unordered_map<std::string, std::string> m_gpioStates;
-  std::unordered_map<std::string, Datagram::Gpio::Mode> m_gpioModes;
+  using PinInfo = std::unordered_map<std::string, std::string>;
+
+  std::unordered_map<std::string, PinInfo> m_gpioInfo;
 
   Datagram::Gpio m_gpioDatagram;
 
-  void loadGpioStates(std::string &projectName);
-  void loadGpioModes(std::string &projectName);
+  std::string stringifyPinMode(Datagram::Gpio::Mode mode);
+  
+  void loadGpioInfo(std::string &projectName);
+  void saveGpioInfo(std::string &projectName);
 
  public:
   GpioManager() = default;
 
   void updateGpioPinState(std::string &projectName, std::string &payload);
   void updateGpioAllStates(std::string &projectName, std::string &payload);
-  void updateGpioModes(std::string &projectName, std::string &payload);
+  void updateGpioPinMode(std::string &projectName, std::string &payload);
+  void updateGpioAllModes(std::string &projectName, std::string &payload);
 
   std::string createGpioCommand(CommandCode commandCode, std::string &gpioPortPin, std::string data);
 };
