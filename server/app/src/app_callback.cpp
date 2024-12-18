@@ -23,10 +23,9 @@ void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &mes
         srv->updateClientName(src, clientMetadata.getProjectName());
       }
 
-      globalJSON.setProjectValue(src->getClientName(), "Project Name", src->getClientName()); /* Get the updated name if there are duplicates */
-      globalJSON.setProjectValue(src->getClientName(), "Project Status", clientMetadata.getProjectStatus());
-      globalJSON.setProjectValue(src->getClientName(), "Hardware Model", clientMetadata.getHardwareModel());
-      globalJSON.setProjectValue(src->getClientName(), "Project Uptime", std::to_string(clientMetadata.getProjectRuntime()));
+      globalJSON.setProjectValue(src->getClientName(), "project_name", src->getClientName()); /* Get the updated name if there are duplicates */
+      globalJSON.setProjectValue(src->getClientName(), "project_status", clientMetadata.getProjectStatus());
+      globalJSON.setProjectValue(src->getClientName(), "hardware_model", clientMetadata.getHardwareModel());
 
       break;
     }

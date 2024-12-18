@@ -8,55 +8,97 @@
 #include <string>
 #include <unordered_map>
 
-#define DEFAULT_JSON_PATH "ProjectInfo.json"
 #define PROJECT_VERSION "1.0.0"
 
 class JSONManager {
  private:
-  std::string m_JSONPath;
-  nlohmann::json m_globalJSON;
+  static constexpr const char *DEFAULT_JSON_PATH = "./Simulation_JSON/";
+  std::filesystem::path m_projectBasePath;
 
-  nlohmann::json createDefaultProjectJSON(const std::string &projectName);
-  void loadGlobalJSON();
-  void saveGlobalJSON();
+  void createDefaultProjectJSON(const std::string &projectName);
+  std::filesystem::path getProjectFilePath(const std::string &projectName);
+
+  nlohmann::json loadProjectJSON(const std::string &projectName);
+  void saveProjectJSON(const std::string &projectName, const nlohmann::json &projectData);
 
  public:
   JSONManager();
-  nlohmann::json &getProjectJSON(const std::string &projectName);
+
+  bool projectExists(const std::string &projectName);
+  void deleteProject(const std::string &projectName);
 
   template <typename T>
   void setProjectValue(const std::string &projectName, const std::string &key, T value) {
     try {
-      loadGlobalJSON();
+      nlohmann::json projectJSON = loadProjectJSON(projectName);
 
-      if (!m_globalJSON["projects"].contains(projectName)) {
-        createDefaultProjectJSON(projectName);
-      }
+      projectJSON[key] = value;
 
-      m_globalJSON["projects"][projectName][key] = value;
-      saveGlobalJSON();
+      saveProjectJSON(projectName, projectJSON);
     } catch (const std::exception &e) {
       std::cerr << "Error setting project value: " << e.what() << std::endl;
     }
   }
 
   template <typename T>
-  T getProjectValue(const std::string &projectName, const std::string &key) {
+  void setProjectNestedValue(const std::string &projectName, const std::vector<std::string> &keyPath, const T &value) {
     try {
-      loadGlobalJSON();
+      nlohmann::json projectJSON = loadProjectJSON(projectName);
 
-      if (!m_globalJSON["projects"].contains(projectName)) {
-        throw std::runtime_error("Project not found " + projectName);
+      nlohmann::json *current = &projectJSON;
+
+      /* Navigate to the desired key location */
+      for (size_t i = 0; i < keyPath.size() - 1; ++i) {
+        if (!current->contains(keyPath[i])) {
+          (*current)[keyPath[i]] = nlohmann::json::object();
+        }
+        /* Update the JSON pointer to the nested JSON */
+        current = &((*current)[keyPath[i]]);
       }
 
-      if (m_globalJSON["projects"][projectName].contains(key)) {
-        return m_globalJSON["projects"][projectName].at(key).get<T>();
+      (*current)[keyPath.back()] = value;
+
+      saveProjectJSON(projectName, projectJSON);
+    } catch (const std::exception &e) {
+      std::cerr << "Error setting nested project value: " << e.what() << std::endl;
+    }
+  }
+
+  template <typename T>
+  T getProjectValue(const std::string &projectName, const std::string &key) {
+    try {
+      nlohmann::json projectJSON = loadProjectJSON(projectName);
+
+      if (projectJSON.contains(key)) {
+        return projectJSON[key].get<T>();
       }
 
     } catch (const std::exception &e) {
       std::cerr << "Error getting project value: " << e.what() << std::endl;
     }
     return static_cast<T>(0U);
+  }
+
+  template <typename T = nlohmann::json>
+  T getProjectNestedValue(const std::string &projectName, const std::vector<std::string> &keyPath, const T &defaultValue = T()) {
+    try {
+      nlohmann::json projectJSON = loadProjectJSON(projectName);
+
+      const nlohmann::json *current = &projectJSON;
+      /* Navigate to the desired key location */
+      for (const auto &key : keyPath) {
+        if (!current->contains(key)) {
+          return defaultValue;
+        }
+        /* Update the JSON pointer to the nested JSON */
+        current = &((*current)[key]);
+      }
+
+      return current->get<T>();
+    } catch (const std::exception &e) {
+      std::cerr << "Error getting nested project value: " << e.what() << std::endl;
+      return defaultValue;
+    }
   }
 };
 

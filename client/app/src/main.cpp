@@ -11,12 +11,7 @@ GpioManager clientGpioManager;
 std::string projectName = DEFAULT_PROJECT_NAME;
 
 void connectCallback(TCPClient *client) {
-  Datagram::Metadata::Payload initialData = {
-      .projectName = projectName,
-      .projectStatus = "RUNNING",
-      .hardwareModel = "MS16.0.0",
-      .projectRuntime = 0,
-  };
+  Datagram::Metadata::Payload initialData = {.projectName = projectName, .projectStatus = "RUNNING", .hardwareModel = "MS16.0.0"};
 
   Datagram::Metadata projectMetadata(initialData);
 

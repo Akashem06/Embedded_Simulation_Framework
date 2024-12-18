@@ -1,51 +1,104 @@
 #include "json_manager.h"
 
-nlohmann::json JSONManager::createDefaultProjectJSON(const std::string &projectName) {
-  return {{"project_name", projectName}, {"version", PROJECT_VERSION}};
-}
+#include <chrono>
+#include <ctime>
 
-void JSONManager::loadGlobalJSON() {
+void JSONManager::createDefaultProjectJSON(const std::string &projectName) {
+  if (projectExists(projectName)) {
+    std::cerr << "Project '" << projectName << "' already exists." << std::endl;
+    return;
+  }
+
   try {
-    std::ifstream globalJSON(m_JSONPath);
-    m_globalJSON = nlohmann::json::parse(globalJSON);
+    std::time_t now = std::time(nullptr);
+
+    /* YYYY-MM-DD HH:MM:SS -> 19 chars + null terminator */
+    char timeBuffer[20];
+    std::strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
+
+    nlohmann::json defaultJSON = {
+        {"project_name", projectName}, {"version", "1.0.0"}, {"created_at", std::string(timeBuffer)}, {"settings", nlohmann::json::object()}};
+    saveProjectJSON(projectName, defaultJSON);
   } catch (const std::exception &e) {
-    std::cerr << "Error loading global JSON: " << e.what() << std::endl;
+    std::cerr << "Error creating project JSON: " << e.what() << std::endl;
   }
 }
 
-void JSONManager::saveGlobalJSON() {
+std::filesystem::path JSONManager::getProjectFilePath(const std::string &projectName) {
+  std::string sanitizedName = projectName;
+
+  /* Get rid of special characters that aren't _ or - */
+  for (char &c : sanitizedName) {
+    if (!std::isalnum(c) && c != '_' && c != '-') {
+      c = '_';
+    }
+  }
+  return m_projectBasePath / (sanitizedName + ".json");
+}
+
+nlohmann::json JSONManager::loadProjectJSON(const std::string &projectName) {
   try {
-    std::ofstream globalJSON(m_JSONPath);
-    globalJSON << m_globalJSON.dump(2);
+    std::filesystem::path projectPath = getProjectFilePath(projectName);
+
+    if (!std::filesystem::exists(projectPath)) {
+      createDefaultProjectJSON(projectName);
+    }
+
+    std::ifstream projectFile(projectPath);
+    if (!projectFile.is_open()) {
+      throw std::runtime_error("Could not open project JSON file");
+    }
+
+    return nlohmann::json::parse(projectFile);
+
   } catch (const std::exception &e) {
-    std::cerr << "Error saving global JSON: " << e.what() << std::endl;
+    std::cerr << "Error loading project JSON: " << e.what() << std::endl;
+  }
+  return nlohmann::json::object();
+}
+
+void JSONManager::saveProjectJSON(const std::string &projectName, const nlohmann::json &projectData) {
+  try {
+    std::filesystem::path projectPath = getProjectFilePath(projectName);
+
+    std::ofstream projectFile(projectPath);
+    if (!projectFile.is_open()) {
+      throw std::runtime_error("Could not open project JSON file for writing");
+    }
+
+    projectFile << projectData.dump(2);
+  } catch (const std::exception &e) {
+    std::cerr << "Error saving project JSON: " << e.what() << std::endl;
   }
 }
 
 JSONManager::JSONManager() {
-  m_JSONPath = DEFAULT_JSON_PATH;
+  /* Create the JSON output directory */
+  m_projectBasePath = std::filesystem::absolute(DEFAULT_JSON_PATH);
+  std::filesystem::create_directories(m_projectBasePath);
 
-  try {
-    m_globalJSON = {{"version", "1.0.0"}, {"projects", nlohmann::json::object()}};
-    saveGlobalJSON();
-  } catch (const std::exception &e) {
-    std::cerr << "Error initializing global JSON: " << e.what() << std::endl;
+  /* Clean up the directory by deleting all .json files */
+  for (const auto &file : std::filesystem::directory_iterator(m_projectBasePath)) {
+    if (file.is_regular_file() && file.path().extension() == ".json") {
+      std::filesystem::remove(file.path());
+    }
   }
 }
 
-nlohmann::json &JSONManager::getProjectJSON(const std::string &projectName) {
+bool JSONManager::projectExists(const std::string &projectName) {
+  return std::filesystem::exists(getProjectFilePath(projectName));
+}
+
+void JSONManager::deleteProject(const std::string &projectName) {
   try {
-    loadGlobalJSON();
+    std::filesystem::path projectPath = getProjectFilePath(projectName);
 
-    if (!m_globalJSON["projects"].contains(projectName)) {
-      m_globalJSON["projects"][projectName] = createDefaultProjectJSON(projectName);
-      saveGlobalJSON();
+    if (std::filesystem::exists(projectPath)) {
+      std::filesystem::remove(projectPath);
+    } else {
+      std::cerr << "Project '" << projectName << "' does not exist." << std::endl;
     }
-
-    return m_globalJSON["projects"][projectName];
   } catch (const std::exception &e) {
-    std::cerr << "Error getting project JSON: " << e.what() << std::endl;
+    std::cerr << "Error deleting project JSON: " << e.what() << std::endl;
   }
-
-  return m_globalJSON;
 }

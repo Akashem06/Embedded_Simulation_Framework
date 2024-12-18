@@ -5,9 +5,10 @@
 #include "app.h"
 #include "command_code.h"
 
-#define PIN_STATE_KEY "State"
-#define PIN_MODE_KEY "Mode"
-#define PIN_ALT_FUNC_KEY "Alternate Function"
+#define GPIO_KEY "gpio"
+#define PIN_STATE_KEY "state"
+#define PIN_MODE_KEY "mode"
+#define PIN_ALT_FUNC_KEY "alternate_function"
 
 const char *gpioPortNames[] = {
     "A", /* GPIO_PORT_A */
@@ -109,11 +110,11 @@ std::string GpioManager::stringifyPinAltFunction(Datagram::Gpio::AltFunction alt
 }
 
 void GpioManager::loadGpioInfo(std::string &projectName) {
-  m_gpioInfo = globalJSON.getProjectValue<std::unordered_map<std::string, GpioManager::PinInfo>>(projectName, "Gpio Info");
+  m_gpioInfo = globalJSON.getProjectValue<std::unordered_map<std::string, GpioManager::PinInfo>>(projectName, GPIO_KEY);
 }
 
 void GpioManager::saveGpioInfo(std::string &projectName) {
-  globalJSON.setProjectValue(projectName, "Gpio Info", m_gpioInfo);
+  globalJSON.setProjectValue(projectName, GPIO_KEY, m_gpioInfo);
 
   /* Upon save, clear the memory */
   m_gpioInfo.clear();

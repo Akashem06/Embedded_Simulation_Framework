@@ -11,8 +11,6 @@ class Metadata {
     std::string projectName;
     std::string projectStatus;
     std::string hardwareModel;
-
-    uint32_t projectRuntime;
   };
   explicit Metadata(Payload &data);
   Metadata() = default;
@@ -23,12 +21,10 @@ class Metadata {
   void setProjectName(const std::string &projectName);
   void setProjectStatus(const std::string &projectStatus);
   void setHardwareModel(const std::string &hardwareModel);
-  void setProjectRuntime(const int &projectRuntime);
 
   std::string getProjectName() const;
   std::string getProjectStatus() const;
   std::string getHardwareModel() const;
-  int getProjectRuntime() const;
 
  private:
   Payload m_metadata;

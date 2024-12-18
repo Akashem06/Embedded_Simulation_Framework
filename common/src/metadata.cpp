@@ -14,7 +14,6 @@ std::string Metadata::serialize() const {
   serializeString(serializedData, m_metadata.projectName);
   serializeString(serializedData, m_metadata.projectStatus);
   serializeString(serializedData, m_metadata.hardwareModel);
-  serializeInteger<uint32_t>(serializedData, m_metadata.projectRuntime);
 
   return encodeCommand(CommandCode::METADATA, serializedData);
 }
@@ -25,7 +24,6 @@ void Metadata::deserialize(std::string &metadataPayload) {
   m_metadata.projectName = deserializeString(metadataPayload, offset);
   m_metadata.projectStatus = deserializeString(metadataPayload, offset);
   m_metadata.hardwareModel = deserializeString(metadataPayload, offset);
-  m_metadata.projectRuntime = deserializeInteger<uint32_t>(metadataPayload, offset);
 }
 
 Metadata::Metadata(Payload &data) {
@@ -44,10 +42,6 @@ void Metadata::setHardwareModel(const std::string &hardwareModel) {
   m_metadata.hardwareModel = hardwareModel;
 }
 
-void Metadata::setProjectRuntime(const int &projectRuntime) {
-  m_metadata.projectRuntime = projectRuntime;
-}
-
 std::string Metadata::getProjectName() const {
   return m_metadata.projectName;
 }
@@ -60,7 +54,4 @@ std::string Metadata::getHardwareModel() const {
   return m_metadata.hardwareModel;
 }
 
-int Metadata::getProjectRuntime() const {
-  return m_metadata.projectRuntime;
-}
 }  // namespace Datagram
