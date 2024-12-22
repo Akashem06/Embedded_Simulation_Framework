@@ -331,6 +331,8 @@ std::string GpioManager::createGpioCommand(CommandCode commandCode, std::string 
         m_gpioDatagram.setGpioPort(Datagram::Gpio::Port::NUM_GPIO_PORTS);
         m_gpioDatagram.setGpioPin(Datagram::Gpio::PINS_PER_PORT);
         m_gpioDatagram.setBuffer(&pinState, sizeof(pinState));
+
+        break;
       }
 
       default: {

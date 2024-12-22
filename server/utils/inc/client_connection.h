@@ -12,6 +12,8 @@ class TCPServer;
 
 class ClientConnection {
  private:
+  static const constexpr size_t MAX_CLIENT_BUFFER_SIZE = 512U;
+
   std::atomic<bool> m_isConnected;
   int m_clientPort;
   int m_clientSocket;

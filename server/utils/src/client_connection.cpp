@@ -21,20 +21,20 @@ ClientConnection::ClientConnection(TCPServer *server) {
 ClientConnection::~ClientConnection() {}
 
 void ClientConnection::monitorThreadProcedure() {
-  const int bufferSize = 2048;
+  const int bufferSize = MAX_CLIENT_BUFFER_SIZE;
   char buffer[bufferSize + 1];
-  int n;
+  int numBytes;
 
   m_isConnected = true;
   while (true) {
-    n = read(m_clientSocket, &buffer, bufferSize);
-    if (n <= 0) {
+    numBytes = read(m_clientSocket, &buffer, bufferSize);
+    if (numBytes <= 0) {
       break;
     }
 
-    buffer[n] = '\0';
+    buffer[numBytes] = '\0';
 
-    std::string msg(buffer, n);
+    std::string msg(buffer, numBytes);
     server->messageReceived(this, msg);
   }
 
