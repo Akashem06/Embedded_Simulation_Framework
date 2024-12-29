@@ -13,6 +13,7 @@
 
 #include <atomic>
 #include <cstring>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -20,26 +21,37 @@
 class CanManager {
  private:
   const std::string CAN_INTERFACE_NAME = "vcan0";
+  const std::string CAN_JSON_NAME = "CANManager";
+
+  static const constexpr int FAST_CYCLE_SPEED_MS = 1U;
+  static const constexpr int MEDIUM_CYCLE_SPEED_MS = 100U;
+  static const constexpr int SLOW_CYCLE_SPEED_MS = 1000U;
+
   static const constexpr int UPDATE_CAN_JSON_FREQUENCY_MS = 1000U;
 
-  // std::unordered_map<> m_canInfo;
+  std::unordered_map<std::string, nlohmann::json> m_canInfo;
 
   pthread_mutex_t m_mutex;
   pthread_t m_listenCanBusId;
+  pthread_t m_updateJSONId;
 
-  int m_listeningSocket;
-  struct sockaddr_can m_canAddress;
-  struct ifreq m_interfaceRequest;
+  int m_rawCanSocket;
+  int m_bcmCanSocket;
 
   std::atomic<bool> m_isListening;
 
-  void canCallback();
+  void canMessageHandler(uint32_t id, const uint8_t *data);
 
  public:
-  CanManager() = default;
+  CanManager();
+  ~CanManager();
 
   void listenCanBus();
   void listenCanBusProcedure();
+  void updateJSONProcedure();
+
+  void startCanScheduler();
+  void scheduleCanMessages();
 };
 
 #endif

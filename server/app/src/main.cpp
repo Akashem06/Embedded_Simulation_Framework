@@ -5,6 +5,7 @@
 #include "app.h"
 #include "app_callback.h"
 #include "app_terminal.h"
+#include "can_manager.h"
 #include "client_connection.h"
 #include "gpio_manager.h"
 #include "json_manager.h"
@@ -13,6 +14,7 @@
 
 JSONManager globalJSON;
 GpioManager serverGpioManager;
+CanManager serverCanManager;
 
 int main(int argc, char **argv) {
   std::cout << "Running Server" << std::endl;
@@ -20,6 +22,7 @@ int main(int argc, char **argv) {
   Terminal application_terminal(&tcp_server);
 
   tcp_server.listenClients(1024, applicationCallback);
+  serverCanManager.listenCanBus();
 
 #if USE_NETWORK_TIME_PROTOCOL == 1U
   ntp_server.startListening("127.0.0.1", "time.google.com");

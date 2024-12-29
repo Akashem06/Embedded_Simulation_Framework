@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "can_manager.h"
 #include "gpio_manager.h"
 #include "json_manager.h"
 
@@ -12,5 +13,6 @@
 
 extern JSONManager globalJSON;
 extern GpioManager serverGpioManager;
+extern CanManager serverCanManager;
 
 #endif

@@ -1,0 +1,14 @@
+{
+  "created_at": "2024-12-29 00:50:15",
+  "messages": {
+    "battery_vt": {
+      "batt_perc": 12800,
+      "current": 11798,
+      "temperature": 36355,
+      "voltage": 53764
+    }
+  },
+  "project_name": "CANManager",
+  "settings": {},
+  "version": "1.0.0"
+}

@@ -1,0 +1,60 @@
+#include <iostream>
+#include <unordered_map>
+#include <string>
+#include <cstdint>
+#include <nlohmann/json.hpp>
+
+#include "can_manager.h"
+#include "system_can.h"
+{% set messages = messages | list -%}
+{%- for message in messages %}
+struct {{ message.name | lower }} {
+  {%- for signal in message.signals %}
+  uint{{ signal.length }}_t {{ signal.name }};
+  {%- endfor %}
+
+  void decode(const uint8_t *data) {
+    uint64_t raw_val = 0U;
+    uint8_t start_byte = 0U;
+    
+    {%- for signal in message.signals %}
+    {
+      raw_val = 0U;
+      start_byte = {{signal.start_bit // 8}};
+      {% for i in range((signal.length + 7) // 8) %}raw_val |= static_cast<uint64_t>(data[start_byte + {{ i }}]) << {{ i * 8 }}U;{% endfor %}
+      {{ signal.name }} = raw_val;
+    }
+    {%- endfor %}
+  }
+
+  nlohmann::json to_json() const {
+    return {
+      {%- for signal in message.signals %}
+      {"{{ signal.name }}", {{ signal.name }}}{% if not loop.last %},{% endif %}
+      {%- endfor %}
+    };
+  }
+
+  std::string get_message_name() const {
+    return "{{ message.name }}";
+  }
+};
+
+
+{%- endfor %}
+
+void CanManager::canMessageHandler(uint32_t id, const uint8_t* data) {
+  switch (id) {
+  {%- for message in messages %}
+    case SYSTEM_CAN_MESSAGE_{{message.sender | upper}}_{{message.name | upper}}: {
+        {{ message.name | lower }} *message = new {{ message.name | lower }}();
+        message->decode(data);
+        m_canInfo[message->get_message_name()] = message->to_json();
+        break;
+    }
+  {%- endfor %}
+    default: {
+      std::cout << "Unknown message ID: " << static_cast<int>(id) << std::endl;
+    }
+  }
+}

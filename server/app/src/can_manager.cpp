@@ -5,23 +5,41 @@
 #include <cstring>
 #include <iostream>
 
+#include "app.h"
+#include "thread_helpers.h"
+
+#define CAN_MESSAGE_JSON_KEY "messages"
+
+CanManager::CanManager() {
+  m_isListening = false;
+  m_rawCanSocket = -1;
+  m_bcmCanSocket = -1;
+  pthread_mutex_init(&m_mutex, nullptr);
+}
+
+CanManager::~CanManager() {
+  pthread_mutex_destroy(&m_mutex);
+}
+
 void CanManager::listenCanBusProcedure() {
-  m_listeningSocket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
+  m_rawCanSocket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
-  if (m_listeningSocket < 0) {
-    throw std::runtime_error("Error creating socket for CAN Broadcast Manager");
+  if (m_rawCanSocket < 0) {
+    throw std::runtime_error("Error creating raw CAN socket");
   }
 
-  strcpy(m_interfaceRequest.ifr_name, CAN_INTERFACE_NAME.c_str());
-  if (ioctl(m_listeningSocket, SIOCGIFINDEX, &m_interfaceRequest) < 0) {
-    throw std::runtime_error("Error writing interface name to socketCAN file descriptor");
+  struct ifreq ifr;
+  strcpy(ifr.ifr_name, CAN_INTERFACE_NAME.c_str());
+  if (ioctl(m_rawCanSocket, SIOCGIFINDEX, &ifr) < 0) {
+    throw std::runtime_error("Error binding raw CAN socket to interface");
   }
 
-  m_canAddress.can_family = AF_CAN;
-  m_canAddress.can_ifindex = m_interfaceRequest.ifr_ifindex;
+  struct sockaddr_can addr = {};
+  addr.can_family = AF_CAN;
+  addr.can_ifindex = ifr.ifr_ifindex;
 
-  if (connect(m_listeningSocket, (struct sockaddr *)&m_canAddress, sizeof(m_canAddress)) < 0) {
-    throw std::runtime_error("Error connecting to SocketCAN broadcast manager");
+  if (bind(m_rawCanSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    throw std::runtime_error("Error binding raw CAN socket");
   }
 
   m_isListening = true;
@@ -30,16 +48,30 @@ void CanManager::listenCanBusProcedure() {
   int numBytes;
 
   while (m_isListening) {
-    numBytes = read(m_listeningSocket, &canFrame, sizeof(struct can_frame));
+    numBytes = read(m_rawCanSocket, &canFrame, sizeof(struct can_frame));
 
     if (numBytes < 0) {
       throw std::runtime_error("Error reading CAN data");
       break;
     }
+
+    pthread_mutex_lock(&m_mutex);
+    canMessageHandler(canFrame.can_id, canFrame.data);
+    pthread_mutex_unlock(&m_mutex);
   }
 
-  close(m_listeningSocket);
+  close(m_rawCanSocket);
   m_isListening = false;
+}
+
+void CanManager::updateJSONProcedure() {
+  while (m_isListening) {
+    pthread_mutex_lock(&m_mutex);
+    globalJSON.setProjectValue(CAN_JSON_NAME, CAN_MESSAGE_JSON_KEY, m_canInfo);
+    pthread_mutex_unlock(&m_mutex);
+
+    thread_sleep_ms(UPDATE_CAN_JSON_FREQUENCY_MS);
+  }
 }
 
 void *listenCanBusWrapper(void *param) {
@@ -47,8 +79,20 @@ void *listenCanBusWrapper(void *param) {
 
   try {
     canManager->listenCanBusProcedure();
-  } catch (...) {
-    std::cerr << "Can Manager Thread Error" << std::endl;
+  } catch (std::exception &e) {
+    std::cerr << "Can Manager Listener Thread Error: " << e.what() << std::endl;
+  }
+
+  return nullptr;
+}
+
+void *updateJSONWrapper(void *param) {
+  CanManager *canManager = static_cast<CanManager *>(param);
+
+  try {
+    canManager->updateJSONProcedure();
+  } catch (std::exception &e) {
+    std::cerr << "Can Manager Update JSON Thread Error: " << e.what() << std::endl;
   }
 
   return nullptr;
@@ -61,6 +105,32 @@ void CanManager::listenCanBus() {
   if (pthread_create(&m_listenCanBusId, nullptr, listenCanBusWrapper, this)) {
     throw std::runtime_error("CAN listener thread creation error");
   }
+
+  if (pthread_create(&m_updateJSONId, nullptr, updateJSONWrapper, this)) {
+    throw std::runtime_error("CAN update JSON thread creation error");
+  }
 }
 
-void CanManager::canCallback() {}
+void CanManager::startCanScheduler() {
+  m_bcmCanSocket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
+
+  if (m_bcmCanSocket < 0) {
+    throw std::runtime_error("Error creating socket for CAN Broadcast Manager");
+  }
+
+  struct ifreq ifr;
+  strcpy(ifr.ifr_name, CAN_INTERFACE_NAME.c_str());
+  if (ioctl(m_bcmCanSocket, SIOCGIFINDEX, &ifr) < 0) {
+    throw std::runtime_error("Error writing interface name to socketCAN file descriptor. Check if vcan0 is enabled?");
+  }
+
+  struct sockaddr_can addr = {};
+  addr.can_family = AF_CAN;
+  addr.can_ifindex = ifr.ifr_ifindex;
+
+  if (connect(m_bcmCanSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    throw std::runtime_error("Error connecting to SocketCAN broadcast manager");
+  }
+
+  scheduleCanMessages();
+}

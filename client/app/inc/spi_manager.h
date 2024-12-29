@@ -2,10 +2,9 @@
 #define SPI_MANAGER_H
 
 class SPIManager {
-    private:
-
-    public:
-        SPIManager() = default;
+ private:
+ public:
+  SPIManager() = default;
 };
 
 #endif

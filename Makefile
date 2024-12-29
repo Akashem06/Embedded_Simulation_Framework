@@ -1,60 +1,78 @@
+PROJECT_NAME = SimulationFramework
+
 CPP = g++
 C = gcc
 CPPFLAGS = -Wall -Wextra -pthread
 CFLAGS = -Wall -Wextra
 
-SERVER_DIR = server
-CLIENT_DIR = client
-COMMON_DIR = common
-DRIVERS_DIR = drivers
+SIMULATION_DIR 			?= simulation
+DRIVERS_DIR 			?= drivers
+CAN_DIR 				?= can
 
-COMMON_SRC_DIR = $(COMMON_DIR)/src
-COMMON_INC_DIR = $(COMMON_DIR)/inc
+ROOT_DIR 				:= $(shell pwd)
+BUILD_DIR 				:= $(ROOT_DIR)/build/$(PROJECT_NAME)
 
-SERVER_APP_SRC_DIR = $(SERVER_DIR)/app/src
-SERVER_APP_INC_DIR = $(SERVER_DIR)/app/inc
-SERVER_UTILS_SRC_DIR = $(SERVER_DIR)/utils/src
-SERVER_UTILS_INC_DIR = $(SERVER_DIR)/utils/inc
+SERVER_DIR 				:= server
+CLIENT_DIR 				:= client
+COMMON_DIR 				:= common
 
-CLIENT_APP_SRC_DIR = $(CLIENT_DIR)/app/src
-CLIENT_APP_INC_DIR = $(CLIENT_DIR)/app/inc
-CLIENT_UTILS_SRC_DIR = $(CLIENT_DIR)/utils/src
-CLIENT_UTILS_INC_DIR = $(CLIENT_DIR)/utils/inc
+COMMON_SRC_DIR 			= $(COMMON_DIR)/src
+COMMON_INC_DIR 			= $(COMMON_DIR)/inc
 
-DRIVERS_SRC_DIR = $(DRIVERS_DIR)/src
-DRIVERS_INC_DIR = $(DRIVERS_DIR)/inc
+SERVER_APP_SRC_DIR 		= $(SERVER_DIR)/app/src
+SERVER_APP_INC_DIR 		= $(SERVER_DIR)/app/inc
+SERVER_UTILS_SRC_DIR 	= $(SERVER_DIR)/utils/src
+SERVER_UTILS_INC_DIR 	= $(SERVER_DIR)/utils/inc
 
-BUILD_DIR = build
+CLIENT_APP_SRC_DIR 		= $(CLIENT_DIR)/app/src
+CLIENT_APP_INC_DIR 		= $(CLIENT_DIR)/app/inc
+CLIENT_UTILS_SRC_DIR 	= $(CLIENT_DIR)/utils/src
+CLIENT_UTILS_INC_DIR 	= $(CLIENT_DIR)/utils/inc
 
-COMMON_SRC = $(wildcard $(COMMON_SRC_DIR)/*.cpp)
-COMMON_INC = $(wildcard $(COMMON_INC_DIR)/*.h)
-COMMON_OBJS = $(patsubst $(COMMON_SRC_DIR)/%.cpp,$(BUILD_DIR)/common/%.o,$(COMMON_SRC))
+DRIVERS_SRC_DIR 		= $(DRIVERS_DIR)/src
+DRIVERS_INC_DIR 		= $(DRIVERS_DIR)/inc
 
-SERVER_APP_SRC = $(wildcard $(SERVER_APP_SRC_DIR)/*.cpp)
-SERVER_APP_INC = $(wildcard $(SERVER_APP_INC_DIR)/*.h)
-SERVER_APP_OBJS = $(patsubst $(SERVER_APP_SRC_DIR)/%.cpp,$(BUILD_DIR)/server/app/%.o,$(SERVER_APP_SRC))
+CAN_SRC_DIR 			= $(CAN_DIR)/src
+CAN_INC_DIR 			= $(CAN_DIR)/inc
 
-SERVER_UTILS_SRC = $(wildcard $(SERVER_UTILS_SRC_DIR)/*.cpp)
-SERVER_UTILS_INC = $(wildcard $(SERVER_UTILS_SRC_DIR)/*.h)
-SERVER_UTILS_OBJS = $(patsubst $(SERVER_UTILS_SRC_DIR)/%.cpp,$(BUILD_DIR)/server/utils/%.o,$(SERVER_UTILS_SRC))
+# Source files
+COMMON_SRCS := $(wildcard $(COMMON_DIR)/src/*.cpp)
+SERVER_APP_SRCS := $(wildcard $(SERVER_DIR)/app/src/*.cpp)
+SERVER_UTILS_SRCS := $(wildcard $(SERVER_DIR)/utils/src/*.cpp)
+CLIENT_APP_SRCS := $(wildcard $(CLIENT_DIR)/app/src/*.cpp)
+CLIENT_UTILS_SRCS := $(wildcard $(CLIENT_DIR)/utils/src/*.cpp)
+DRIVERS_SRCS := $(wildcard $(DRIVERS_DIR)/src/*.c)
+CAN_SRCS := $(wildcard $(CAN_DIR)/src/*.c)
 
-CLIENT_APP_SRC = $(wildcard $(CLIENT_APP_SRC_DIR)/*.cpp)
-CLIENT_INC_SRC = $(wildcard $(CLIENT_APP_INC_DIR)/*.h)
-CLIENT_APP_OBJS = $(patsubst $(CLIENT_APP_SRC_DIR)/%.cpp,$(BUILD_DIR)/client/app/%.o,$(CLIENT_APP_SRC))
-
-CLIENT_UTILS_SRC = $(wildcard $(CLIENT_UTILS_SRC_DIR)/*.cpp)
-CLIENT_UTILS_INC = $(wildcard $(CLIENT_UTILS_INC_DIR)/*.h)
-CLIENT_UTILS_OBJS = $(patsubst $(CLIENT_UTILS_SRC_DIR)/%.cpp,$(BUILD_DIR)/client/utils/%.o,$(CLIENT_UTILS_SRC))
-
-DRIVERS_SRC = $(wildcard $(DRIVERS_SRC_DIR)/*.c)
-DRIVERS_INC = $(wildcard $(DRIVERS_INC_DIR)/*.h)
-DRIVERS_OBJS = $(patsubst $(DRIVERS_SRC_DIR)/%.c,$(BUILD_DIR)/drivers/%.o,$(DRIVERS_SRC))
+# Object files
+COMMON_OBJS := $(patsubst $(COMMON_DIR)/src/%.cpp,$(BUILD_DIR)/common/%.o,$(COMMON_SRCS))
+SERVER_APP_OBJS := $(patsubst $(SERVER_DIR)/app/src/%.cpp,$(BUILD_DIR)/server/app/%.o,$(SERVER_APP_SRCS))
+SERVER_UTILS_OBJS := $(patsubst $(SERVER_DIR)/utils/src/%.cpp,$(BUILD_DIR)/server/utils/%.o,$(SERVER_UTILS_SRCS))
+CLIENT_APP_OBJS := $(patsubst $(CLIENT_DIR)/app/src/%.cpp,$(BUILD_DIR)/client/app/%.o,$(CLIENT_APP_SRCS))
+CLIENT_UTILS_OBJS := $(patsubst $(CLIENT_DIR)/utils/src/%.cpp,$(BUILD_DIR)/client/utils/%.o,$(CLIENT_UTILS_SRCS))
+DRIVERS_OBJS := $(patsubst $(DRIVERS_DIR)/src/%.c,$(BUILD_DIR)/drivers/%.o,$(DRIVERS_SRCS))
+CAN_OBJS := $(patsubst $(CAN_DIR)/src/%.c,$(BUILD_DIR)/can/%.o,$(CAN_SRCS))
 
 SERVER_TARGET = tcp_server
 CLIENT_TARGET = tcp_client
 
+.PHONY: all clean server client format help
+
 all: server client
 
+help:
+	@echo "Available targets:"
+	@echo "  all      		 - Build both server and client (default)"
+	@echo "  server   		 - Build only the server"
+	@echo "  client   		 - Build only the client"
+	@echo "  clean    		 - Remove build directory"
+	@echo "  format   		 - Format source files using clang-format"
+	@echo ""
+	@echo "Configuration:"
+	@echo "  BUILD_TYPE      - Debug or Release (default: Debug)"
+	@echo "  SIMULATION_DIR  - Path to simulation directory"
+	@echo "  DRIVERS_DIR     - Path to drivers directory"
+	
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)/common
 	mkdir -p $(BUILD_DIR)/server/app
@@ -62,41 +80,65 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)/client/app
 	mkdir -p $(BUILD_DIR)/client/utils
 	mkdir -p $(BUILD_DIR)/drivers
+	mkdir -p $(BUILD_DIR)/can
 
-server: $(BUILD_DIR)/$(SERVER_TARGET)
+autogen_sim_server_files:
+	@echo "Running autogen scripts..."
+	@python3 -m autogen system_can -o server/app/inc
+	@python3 -m autogen simulation -o server/app/src
+
+server: autogen_sim_server_files $(BUILD_DIR)/$(SERVER_TARGET)
+
 client: $(BUILD_DIR)/$(CLIENT_TARGET)
 
 $(BUILD_DIR)/common/%.o: $(COMMON_SRC_DIR)/%.cpp | $(BUILD_DIR)
+	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(COMMON_INC_DIR) -I$(SERVER_APP_INC_DIR) -I$(SERVER_UTILS_INC_DIR) -I$(CLIENT_APP_INC_DIR) -I$(CLIENT_UTILS_INC_DIR) -c $< -o $@
 
 $(BUILD_DIR)/server/app/%.o: $(SERVER_APP_SRC_DIR)/%.cpp | $(BUILD_DIR)
+	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(SERVER_APP_INC_DIR) -I$(SERVER_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -c $< -o $@
 
 $(BUILD_DIR)/server/utils/%.o: $(SERVER_UTILS_SRC_DIR)/%.cpp | $(BUILD_DIR)
+	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(SERVER_APP_INC_DIR) -I$(SERVER_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -c $< -o $@
 
 $(BUILD_DIR)/client/app/%.o: $(CLIENT_APP_SRC_DIR)/%.cpp | $(BUILD_DIR)
-	$(CPP) $(CPPFLAGS) -I$(CLIENT_APP_INC_DIR) -I$(CLIENT_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -I$(DRIVERS_INC_DIR) -c $< -o $@
+	@echo "Compiling $<"
+	$(CPP) $(CPPFLAGS) -I$(CLIENT_APP_INC_DIR) -I$(CLIENT_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -I$(DRIVERS_INC_DIR) -I$(CAN_INC_DIR) -c $< -o $@
 
 $(BUILD_DIR)/client/utils/%.o: $(CLIENT_UTILS_SRC_DIR)/%.cpp | $(BUILD_DIR)
+	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(CLIENT_APP_INC_DIR) -I$(CLIENT_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -c $< -o $@
 
 $(BUILD_DIR)/drivers/%.o: $(DRIVERS_SRC_DIR)/%.c | $(BUILD_DIR)
+	@echo "Compiling $<"
 	$(C) $(CFLAGS) -I$(DRIVERS_INC_DIR) -c $< -o $@
 
+$(BUILD_DIR)/can/%.o: $(CAN_SRC_DIR)/%.c | $(BUILD_DIR)
+	@echo "Compiling $<"
+	$(C) $(CFLAGS) -I$(CAN_INC_DIR) -I$(DRIVERS_INC_DIR) -c $< -o $@
+
 $(BUILD_DIR)/$(SERVER_TARGET): $(COMMON_OBJS) $(SERVER_APP_OBJS) $(SERVER_UTILS_OBJS)
+	@echo "Linking..."
 	$(CPP) $(CPPFLAGS) $^ -o $@
 
-$(BUILD_DIR)/$(CLIENT_TARGET): $(DRIVERS_OBJS) $(COMMON_OBJS) $(CLIENT_APP_OBJS) $(CLIENT_UTILS_OBJS)
+$(BUILD_DIR)/$(CLIENT_TARGET): $(DRIVERS_OBJS) $(CAN_OBJS) $(COMMON_OBJS) $(CLIENT_APP_OBJS) $(CLIENT_UTILS_OBJS)
+	@echo "Linking..."
 	$(CPP) $(CPPFLAGS) $^ -o $@
 
-clean:
-	rm -rf $(BUILD_DIR)
+init_vcan:
+	@sudo modprobe can_bcm
+	@sudo modprobe can_raw
+	@sudo ip link add dev vcan0 type vcan
+	@sudo ip link set up vcan
 
 format:
-	clang-format -i -style=file $(COMMON_SRC) $(COMMON_INC) \
-	$(SERVER_APP_SRC) $(SERVER_APP_INC) $(SERVER_UTILS_SRC) $(SERVER_UTILS_INC) \
-	$(CLIENT_APP_SRC) $(CLIENT_APP_INC) $(CLIENT_UTILS_SRC) $(CLIENT_UTILS_INC) \
-	$(DRIVERS_SRC) $(DRIVERS_INC)
+	@echo "Formatting source files..."
+	@find . -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i -style=file {} +
 
-.PHONY: all clean server client format
+clean:
+	@echo "Cleaning build directory..."
+	@rm -rf $(BUILD_DIR)
+
+.PHONY: all clean server client format init_vcan

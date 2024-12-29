@@ -1,6 +1,6 @@
 #include "i2c.h"
 
-#include "queue.h"
+#include "queues.h"
 
 // void i2c_set_data(I2CPort i2c, uint8_t *tx_data, size_t tx_len) {
 //   for (size_t tx = 0; tx < tx_len; tx++) {
