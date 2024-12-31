@@ -128,10 +128,11 @@ $(BUILD_DIR)/$(CLIENT_TARGET): $(DRIVERS_OBJS) $(CAN_OBJS) $(COMMON_OBJS) $(CLIE
 	$(CPP) $(CPPFLAGS) $^ -o $@
 
 init_vcan:
+	@sudo modprobe vcan
 	@sudo modprobe can_bcm
 	@sudo modprobe can_raw
 	@sudo ip link add dev vcan0 type vcan
-	@sudo ip link set up vcan
+	@sudo ip link set up vcan0
 
 format:
 	@echo "Formatting source files..."

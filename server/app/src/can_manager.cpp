@@ -112,25 +112,30 @@ void CanManager::listenCanBus() {
 }
 
 void CanManager::startCanScheduler() {
-  m_bcmCanSocket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
+  try {
+    m_bcmCanSocket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
 
-  if (m_bcmCanSocket < 0) {
-    throw std::runtime_error("Error creating socket for CAN Broadcast Manager");
+    if (m_bcmCanSocket < 0) {
+      throw std::runtime_error("Error creating socket for CAN Broadcast Manager");
+    }
+
+    struct ifreq ifr;
+    strcpy(ifr.ifr_name, CAN_INTERFACE_NAME.c_str());
+    if (ioctl(m_bcmCanSocket, SIOCGIFINDEX, &ifr) < 0) {
+      throw std::runtime_error("Error writing interface name to socketCAN file descriptor. Check if vcan0 is enabled?");
+    }
+
+    struct sockaddr_can addr = {};
+    addr.can_family = AF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    if (connect(m_bcmCanSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+      throw std::runtime_error("Error connecting to SocketCAN broadcast manager");
+    }
+
+    scheduleCanMessages();
+
+  } catch (std::exception &e) {
+    std::cerr << "Error running CAN Scheduler: " << e.what() << std::endl;
   }
-
-  struct ifreq ifr;
-  strcpy(ifr.ifr_name, CAN_INTERFACE_NAME.c_str());
-  if (ioctl(m_bcmCanSocket, SIOCGIFINDEX, &ifr) < 0) {
-    throw std::runtime_error("Error writing interface name to socketCAN file descriptor. Check if vcan0 is enabled?");
-  }
-
-  struct sockaddr_can addr = {};
-  addr.can_family = AF_CAN;
-  addr.can_ifindex = ifr.ifr_ifindex;
-
-  if (connect(m_bcmCanSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    throw std::runtime_error("Error connecting to SocketCAN broadcast manager");
-  }
-
-  scheduleCanMessages();
 }

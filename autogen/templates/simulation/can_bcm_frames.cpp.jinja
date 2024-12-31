@@ -7,8 +7,8 @@
 #define NUM_MEDIUM_CYCLE_MESSAGES         {{ message_count.medium_cycle }}U
 #define NUM_SLOW_CYCLE_MESSAGES           {{ message_count.slow_cycle }}U
 #define NUM_TOTAL_MESSAGES                {{ message_count.total }}U
-
-{% set messages = messages | list -%}
+#define MAX_MESSAGE_LENGTH                8U
+{% set messages = messages | list %}
 void CanManager::scheduleCanMessages() {
   struct {
     struct bcm_msg_head msg_head;
@@ -16,13 +16,25 @@ void CanManager::scheduleCanMessages() {
   } canFastCycleBCM;
 
   canFastCycleBCM.msg_head.opcode  = TX_SETUP;
-  canFastCycleBCM.msg_head.can_id  = 0;
+  canFastCycleBCM.msg_head.can_id  = FAST_CYCLE_BCM_ID;
   canFastCycleBCM.msg_head.flags   = SETTIMER | STARTTIMER;
   canFastCycleBCM.msg_head.nframes = NUM_FAST_CYCLE_MESSAGES;
   canFastCycleBCM.msg_head.count   = 0;
 
+  canFastCycleBCM.msg_head.ival1.tv_sec = 0U;
+  canFastCycleBCM.msg_head.ival1.tv_usec = 0U;
   canFastCycleBCM.msg_head.ival2.tv_sec = FAST_CYCLE_SPEED_MS / 1000U;
-  canFastCycleBCM.msg_head.ival2.tv_usec = (FAST_CYCLE_SPEED_MS % 1000U) * 1000000U;
+  canFastCycleBCM.msg_head.ival2.tv_usec = (FAST_CYCLE_SPEED_MS % 1000U) * 1000U;
+
+  {% set fast_message = namespace(count = 0) %}
+  {%- for message in messages %}
+  {%- if message.cycle == "fast" %}
+  canFastCycleBCM.frame[{{ fast_message.count }}U].can_id = SYSTEM_CAN_MESSAGE_{{ message.sender | upper }}_{{ message.name | upper }};
+  canFastCycleBCM.frame[{{ fast_message.count }}U].can_dlc = {{ (message.signals | sum(attribute='length') / 8) | int }}U;
+  memset(canFastCycleBCM.frame[{{ fast_message.count }}U].data, 0U, MAX_MESSAGE_LENGTH);
+  {%- set fast_message.count = fast_message.count + 1 %}
+  {%- endif %}
+  {%- endfor %}
 
   if (write(m_bcmCanSocket, &canFastCycleBCM, sizeof(canFastCycleBCM)) < 0) {
     throw std::runtime_error("Failed to schedule CAN BCM Fast cycle messages");
@@ -34,13 +46,25 @@ void CanManager::scheduleCanMessages() {
   } canMediumCycleBCM;
 
   canMediumCycleBCM.msg_head.opcode  = TX_SETUP;
-  canMediumCycleBCM.msg_head.can_id  = 0;
+  canMediumCycleBCM.msg_head.can_id  = MEDIUM_CYCLE_BCM_ID;
   canMediumCycleBCM.msg_head.flags   = SETTIMER | STARTTIMER;
   canMediumCycleBCM.msg_head.nframes = NUM_MEDIUM_CYCLE_MESSAGES;
   canMediumCycleBCM.msg_head.count   = 0;
 
+  canMediumCycleBCM.msg_head.ival1.tv_sec = 0U;
+  canMediumCycleBCM.msg_head.ival1.tv_usec = 0U;
   canMediumCycleBCM.msg_head.ival2.tv_sec = MEDIUM_CYCLE_SPEED_MS / 1000U;
-  canMediumCycleBCM.msg_head.ival2.tv_usec = (MEDIUM_CYCLE_SPEED_MS % 1000U) * 1000000U;
+  canMediumCycleBCM.msg_head.ival2.tv_usec = (MEDIUM_CYCLE_SPEED_MS % 1000U) * 1000U;
+
+  {% set medium_message = namespace(count = 0) %}
+  {%- for message in messages %}
+  {%- if message.cycle == "medium" %}
+  canMediumCycleBCM.frame[{{ medium_message.count }}U].can_id = SYSTEM_CAN_MESSAGE_{{ message.sender | upper }}_{{ message.name | upper }};
+  canMediumCycleBCM.frame[{{ medium_message.count }}U].can_dlc = {{ (message.signals | sum(attribute='length') / 8) | int }}U;
+  memset(canMediumCycleBCM.frame[{{ medium_message.count }}U].data, 0U, MAX_MESSAGE_LENGTH);
+  {%- set medium_message.count = medium_message.count + 1 %}
+  {%- endif %}
+  {%- endfor %}
 
   if (write(m_bcmCanSocket, &canMediumCycleBCM, sizeof(canMediumCycleBCM)) < 0) {
     throw std::runtime_error("Failed to schedule CAN BCM Medium cycle messages");
@@ -52,13 +76,25 @@ void CanManager::scheduleCanMessages() {
   } canSlowCycleBCM;
 
   canSlowCycleBCM.msg_head.opcode  = TX_SETUP;
-  canSlowCycleBCM.msg_head.can_id  = 0;
+  canSlowCycleBCM.msg_head.can_id  = SLOW_CYCLE_BCM_ID;
   canSlowCycleBCM.msg_head.flags   = SETTIMER | STARTTIMER;
   canSlowCycleBCM.msg_head.nframes = NUM_SLOW_CYCLE_MESSAGES;
   canSlowCycleBCM.msg_head.count   = 0;
 
+  canSlowCycleBCM.msg_head.ival1.tv_sec = 0U;
+  canSlowCycleBCM.msg_head.ival1.tv_usec = 0U;
   canSlowCycleBCM.msg_head.ival2.tv_sec = SLOW_CYCLE_SPEED_MS / 1000U;
-  canSlowCycleBCM.msg_head.ival2.tv_usec = (SLOW_CYCLE_SPEED_MS % 1000U) * 1000000U;
+  canSlowCycleBCM.msg_head.ival2.tv_usec = (SLOW_CYCLE_SPEED_MS % 1000U) * 1000U;
+
+  {% set slow_message = namespace(count = 0) %}
+  {%- for message in messages %}
+  {%- if message.cycle == "slow" %}
+  canSlowCycleBCM.frame[{{ slow_message.count }}U].can_id = SYSTEM_CAN_MESSAGE_{{ message.sender | upper }}_{{ message.name | upper }};
+  canSlowCycleBCM.frame[{{ slow_message.count }}U].can_dlc = {{ (message.signals | sum(attribute='length') / 8) | int }}U;
+  memset(canSlowCycleBCM.frame[{{ slow_message.count }}U].data, 0U, MAX_MESSAGE_LENGTH);
+  {%- set slow_message.count = slow_message.count + 1 %}
+  {%- endif %}
+  {%- endfor %}
 
   if (write(m_bcmCanSocket, &canSlowCycleBCM, sizeof(canSlowCycleBCM)) < 0) {
     throw std::runtime_error("Failed to schedule CAN BCM Slow cycle messages");

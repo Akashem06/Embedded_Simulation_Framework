@@ -29,6 +29,10 @@ class CanManager {
 
   static const constexpr int UPDATE_CAN_JSON_FREQUENCY_MS = 1000U;
 
+  static const constexpr int SLOW_CYCLE_BCM_ID = 0U;
+  static const constexpr int MEDIUM_CYCLE_BCM_ID = 1U;
+  static const constexpr int FAST_CYCLE_BCM_ID = 2U;
+
   std::unordered_map<std::string, nlohmann::json> m_canInfo;
 
   pthread_mutex_t m_mutex;

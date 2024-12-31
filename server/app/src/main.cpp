@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
 
   tcp_server.listenClients(1024, applicationCallback);
   serverCanManager.listenCanBus();
+  serverCanManager.startCanScheduler();
 
 #if USE_NETWORK_TIME_PROTOCOL == 1U
   ntp_server.startListening("127.0.0.1", "time.google.com");
