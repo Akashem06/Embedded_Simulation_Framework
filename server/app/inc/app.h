@@ -3,7 +3,8 @@
 
 #include <string>
 
-#include "can_manager.h"
+#include "can_listener.h"
+#include "can_scheduler.h"
 #include "gpio_manager.h"
 #include "json_manager.h"
 
@@ -11,8 +12,9 @@
 #define USE_NETWORK_TIME_PROTOCOL 0U
 #endif
 
-extern JSONManager globalJSON;
+extern JSONManager serverJSONManager;
 extern GpioManager serverGpioManager;
-extern CanManager serverCanManager;
+extern CanListener serverCanListener;
+extern CanScheduler serverCanScheduler;
 
 #endif

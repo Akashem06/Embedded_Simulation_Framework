@@ -1,4 +1,4 @@
-#include "can_manager.h"
+#include "can_listener.h"
 
 #include <unistd.h>
 
@@ -6,22 +6,22 @@
 #include <iostream>
 
 #include "app.h"
+#include "system_can.h"
 #include "thread_helpers.h"
 
 #define CAN_MESSAGE_JSON_KEY "messages"
 
-CanManager::CanManager() {
+CanListener::CanListener() {
   m_isListening = false;
   m_rawCanSocket = -1;
-  m_bcmCanSocket = -1;
   pthread_mutex_init(&m_mutex, nullptr);
 }
 
-CanManager::~CanManager() {
+CanListener::~CanListener() {
   pthread_mutex_destroy(&m_mutex);
 }
 
-void CanManager::listenCanBusProcedure() {
+void CanListener::listenCanBusProcedure() {
   m_rawCanSocket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
   if (m_rawCanSocket < 0) {
@@ -64,10 +64,10 @@ void CanManager::listenCanBusProcedure() {
   m_isListening = false;
 }
 
-void CanManager::updateJSONProcedure() {
+void CanListener::updateJSONProcedure() {
   while (m_isListening) {
     pthread_mutex_lock(&m_mutex);
-    globalJSON.setProjectValue(CAN_JSON_NAME, CAN_MESSAGE_JSON_KEY, m_canInfo);
+    serverJSONManager.setProjectValue(CAN_JSON_NAME, CAN_MESSAGE_JSON_KEY, m_canInfo);
     pthread_mutex_unlock(&m_mutex);
 
     thread_sleep_ms(UPDATE_CAN_JSON_FREQUENCY_MS);
@@ -75,30 +75,30 @@ void CanManager::updateJSONProcedure() {
 }
 
 void *listenCanBusWrapper(void *param) {
-  CanManager *canManager = static_cast<CanManager *>(param);
+  CanListener *canListener = static_cast<CanListener *>(param);
 
   try {
-    canManager->listenCanBusProcedure();
+    canListener->listenCanBusProcedure();
   } catch (std::exception &e) {
-    std::cerr << "Can Manager Listener Thread Error: " << e.what() << std::endl;
+    std::cerr << "Can Listener Listener Thread Error: " << e.what() << std::endl;
   }
 
   return nullptr;
 }
 
 void *updateJSONWrapper(void *param) {
-  CanManager *canManager = static_cast<CanManager *>(param);
+  CanListener *canListener = static_cast<CanListener *>(param);
 
   try {
-    canManager->updateJSONProcedure();
+    canListener->updateJSONProcedure();
   } catch (std::exception &e) {
-    std::cerr << "Can Manager Update JSON Thread Error: " << e.what() << std::endl;
+    std::cerr << "Can Listener Update JSON Thread Error: " << e.what() << std::endl;
   }
 
   return nullptr;
 }
 
-void CanManager::listenCanBus() {
+void CanListener::listenCanBus() {
   if (m_isListening)
     return;
 
@@ -108,34 +108,5 @@ void CanManager::listenCanBus() {
 
   if (pthread_create(&m_updateJSONId, nullptr, updateJSONWrapper, this)) {
     throw std::runtime_error("CAN update JSON thread creation error");
-  }
-}
-
-void CanManager::startCanScheduler() {
-  try {
-    m_bcmCanSocket = socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
-
-    if (m_bcmCanSocket < 0) {
-      throw std::runtime_error("Error creating socket for CAN Broadcast Manager");
-    }
-
-    struct ifreq ifr;
-    strcpy(ifr.ifr_name, CAN_INTERFACE_NAME.c_str());
-    if (ioctl(m_bcmCanSocket, SIOCGIFINDEX, &ifr) < 0) {
-      throw std::runtime_error("Error writing interface name to socketCAN file descriptor. Check if vcan0 is enabled?");
-    }
-
-    struct sockaddr_can addr = {};
-    addr.can_family = AF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
-
-    if (connect(m_bcmCanSocket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-      throw std::runtime_error("Error connecting to SocketCAN broadcast manager");
-    }
-
-    scheduleCanMessages();
-
-  } catch (std::exception &e) {
-    std::cerr << "Error running CAN Scheduler: " << e.what() << std::endl;
   }
 }

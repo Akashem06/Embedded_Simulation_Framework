@@ -110,11 +110,11 @@ std::string GpioManager::stringifyPinAltFunction(Datagram::Gpio::AltFunction alt
 }
 
 void GpioManager::loadGpioInfo(std::string &projectName) {
-  m_gpioInfo = globalJSON.getProjectValue<std::unordered_map<std::string, GpioManager::PinInfo>>(projectName, GPIO_KEY);
+  m_gpioInfo = serverJSONManager.getProjectValue<std::unordered_map<std::string, GpioManager::PinInfo>>(projectName, GPIO_KEY);
 }
 
 void GpioManager::saveGpioInfo(std::string &projectName) {
-  globalJSON.setProjectValue(projectName, GPIO_KEY, m_gpioInfo);
+  serverJSONManager.setProjectValue(projectName, GPIO_KEY, m_gpioInfo);
 
   /* Upon save, clear the memory */
   m_gpioInfo.clear();

@@ -84,8 +84,8 @@ $(BUILD_DIR):
 
 autogen_sim_server_files:
 	@echo "Running autogen scripts..."
-	@python3 -m autogen system_can -o server/app/inc
-	@python3 -m autogen simulation -o server/app/src
+	@python3 -m autogen system_can -o $(SERVER_APP_INC_DIR)
+	@python3 -m autogen simulation_app -o $(SERVER_DIR)/app
 
 server: autogen_sim_server_files $(BUILD_DIR)/$(SERVER_TARGET)
 

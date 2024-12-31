@@ -1,5 +1,5 @@
-#ifndef CAN_MANAGER_H
-#define CAN_MANAGER_H
+#ifndef CAN_LISTENER_H
+#define CAN_LISTENER_H
 
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -18,20 +18,12 @@
 #include <unordered_map>
 #include <vector>
 
-class CanManager {
+class CanListener {
  private:
   const std::string CAN_INTERFACE_NAME = "vcan0";
-  const std::string CAN_JSON_NAME = "CANManager";
+  const std::string CAN_JSON_NAME = "CANListener";
 
-  static const constexpr int FAST_CYCLE_SPEED_MS = 1U;
-  static const constexpr int MEDIUM_CYCLE_SPEED_MS = 100U;
-  static const constexpr int SLOW_CYCLE_SPEED_MS = 1000U;
-
-  static const constexpr int UPDATE_CAN_JSON_FREQUENCY_MS = 1000U;
-
-  static const constexpr int SLOW_CYCLE_BCM_ID = 0U;
-  static const constexpr int MEDIUM_CYCLE_BCM_ID = 1U;
-  static const constexpr int FAST_CYCLE_BCM_ID = 2U;
+  static const constexpr unsigned int UPDATE_CAN_JSON_FREQUENCY_MS = 1000U;
 
   std::unordered_map<std::string, nlohmann::json> m_canInfo;
 
@@ -40,22 +32,18 @@ class CanManager {
   pthread_t m_updateJSONId;
 
   int m_rawCanSocket;
-  int m_bcmCanSocket;
 
   std::atomic<bool> m_isListening;
 
   void canMessageHandler(uint32_t id, const uint8_t *data);
 
  public:
-  CanManager();
-  ~CanManager();
+  CanListener();
+  ~CanListener();
 
   void listenCanBus();
   void listenCanBusProcedure();
   void updateJSONProcedure();
-
-  void startCanScheduler();
-  void scheduleCanMessages();
 };
 
 #endif

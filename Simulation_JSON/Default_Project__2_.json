@@ -1,5 +1,5 @@
 {
-  "created_at": "2024-12-31 13:17:32",
+  "created_at": "2024-12-31 13:17:33",
   "gpio": {
     "A0": {
       "alternate_function": "None/SWDIO/SWCLK ALT0",
@@ -163,7 +163,7 @@
     }
   },
   "hardware_model": "MS16.0.0",
-  "project_name": "Default Project (1)",
+  "project_name": "Default Project (2)",
   "project_status": "RUNNING",
   "settings": {},
   "version": "1.0.0"

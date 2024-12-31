@@ -23,9 +23,10 @@ void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &mes
         srv->updateClientName(src, clientMetadata.getProjectName());
       }
 
-      globalJSON.setProjectValue(src->getClientName(), "project_name", src->getClientName()); /* Get the updated name if there are duplicates */
-      globalJSON.setProjectValue(src->getClientName(), "project_status", clientMetadata.getProjectStatus());
-      globalJSON.setProjectValue(src->getClientName(), "hardware_model", clientMetadata.getHardwareModel());
+      serverJSONManager.setProjectValue(src->getClientName(), "project_name",
+                                        src->getClientName()); /* Get the updated name if there are duplicates */
+      serverJSONManager.setProjectValue(src->getClientName(), "project_status", clientMetadata.getProjectStatus());
+      serverJSONManager.setProjectValue(src->getClientName(), "hardware_model", clientMetadata.getHardwareModel());
 
       break;
     }

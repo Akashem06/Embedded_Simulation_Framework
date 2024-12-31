@@ -22,7 +22,7 @@ def main():
 
     args = parser.parse_args()
 
-    if args.template_name in ["cantools", "system_can", "project_can", "simulation"]:
+    if args.template_name in ["cantools", "system_can", "project_can", "simulation_app"]:
         from .can_autogen import get_data
 
     data = get_data(args)
