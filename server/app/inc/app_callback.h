@@ -4,8 +4,8 @@
 #include <string>
 
 #include "client_connection.h"
-#include "tcp_server.h"
+#include "server.h"
 
-void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &message);
-
+void applicationMessageCallback(Server *srv, ClientConnection *src, std::string &message);
+void applicationConnectCallback(Server *srv, ClientConnection *src);
 #endif

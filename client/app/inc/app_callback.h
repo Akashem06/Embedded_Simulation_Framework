@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "tcp_client.h"
+#include "client.h"
 
-void applicationMessageCallback(TCPClient *client, std::string &message);
-
+void applicationMessageCallback(Client *client, std::string &message);
+void applicationConnectCallback(Client *client);
 #endif

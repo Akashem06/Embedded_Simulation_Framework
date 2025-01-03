@@ -11,7 +11,7 @@
 #include "gpio_manager.h"
 #include "json_manager.h"
 #include "ntp_server.h"
-#include "tcp_server.h"
+#include "server.h"
 
 JSONManager serverJSONManager;
 GpioManager serverGpioManager;
@@ -20,10 +20,10 @@ CanScheduler serverCanScheduler;
 
 int main(int argc, char **argv) {
   std::cout << "Running Server" << std::endl;
-  TCPServer tcpServer;
-  Terminal applicationTerminal(&tcpServer);
+  Server Server;
+  Terminal applicationTerminal(&Server);
 
-  tcpServer.listenClients(1024, applicationCallback);
+  Server.listenClients(1024, applicationMessageCallback, applicationConnectCallback);
 
   serverCanListener.listenCanBus();
 

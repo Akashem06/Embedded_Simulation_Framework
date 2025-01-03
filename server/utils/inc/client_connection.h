@@ -8,25 +8,20 @@
 #include <string>
 
 /* Forward declaration */
-class TCPServer;
+class Server;
 
 class ClientConnection {
  private:
-  static const constexpr size_t MAX_CLIENT_BUFFER_SIZE = 512U;
-
   std::atomic<bool> m_isConnected;
   int m_clientPort;
   int m_clientSocket;
   struct sockaddr_in m_clientAddress;
-  pthread_t m_monitorThreadId;
   std::string m_clientName;
 
-  TCPServer *server;
-
-  std::string getClientAddress() const;
+  Server *server;
 
  public:
-  ClientConnection(TCPServer *server);
+  ClientConnection(Server *server);
   ~ClientConnection();
 
   bool acceptClient(int listeningSocket);
@@ -39,6 +34,9 @@ class ClientConnection {
 
   int getClientPort() const;
   void setClientPort(int port);
+
+  int getSocketFd() const;
+  std::string getClientAddress() const;
 
   bool isConnected();
 };

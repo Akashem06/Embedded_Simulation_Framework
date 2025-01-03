@@ -53,8 +53,8 @@ CLIENT_UTILS_OBJS := $(patsubst $(CLIENT_DIR)/utils/src/%.cpp,$(BUILD_DIR)/clien
 DRIVERS_OBJS := $(patsubst $(DRIVERS_DIR)/src/%.c,$(BUILD_DIR)/drivers/%.o,$(DRIVERS_SRCS))
 CAN_OBJS := $(patsubst $(CAN_DIR)/src/%.c,$(BUILD_DIR)/can/%.o,$(CAN_SRCS))
 
-SERVER_TARGET = tcp_server
-CLIENT_TARGET = tcp_client
+SERVER_TARGET = sim_server
+CLIENT_TARGET = sim_client
 
 .PHONY: all clean server client format help
 
@@ -62,16 +62,16 @@ all: server client
 
 help:
 	@echo "Available targets:"
-	@echo "  all      		 - Build both server and client (default)"
-	@echo "  server   		 - Build only the server"
-	@echo "  client   		 - Build only the client"
-	@echo "  clean    		 - Remove build directory"
-	@echo "  format   		 - Format source files using clang-format"
+	@echo "  all      		 	- Build both server and client (default)"
+	@echo "  server   		 	- Build only the server"
+	@echo "  client   		 	- Build only the client"
+	@echo "  clean    		 	- Remove build directory"
+	@echo "  format   		 	- Format source files using clang-format"
 	@echo ""
 	@echo "Configuration:"
-	@echo "  BUILD_TYPE      - Debug or Release (default: Debug)"
-	@echo "  SIMULATION_DIR  - Path to simulation directory"
-	@echo "  DRIVERS_DIR     - Path to drivers directory"
+	@echo "  BUILD_TYPE      	- Debug or Release (default: Debug)"
+	@echo "  SIMULATION_DIR  	- Path to simulation directory"
+	@echo "  DRIVERS_DIR     	- Path to drivers directory"
 	
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)/common

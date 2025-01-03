@@ -1,5 +1,5 @@
-#ifndef TCP_CLIENT_H
-#define TCP_CLIENT_H
+#ifndef CLIENT_H
+#define CLIENT_H
 
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -15,11 +15,11 @@
 #include <queue>
 #include <string>
 
-class TCPClient {
+class Client {
  private:
   static constexpr size_t MAX_BUFFER_SIZE = 256;
-  using messageCallback = std::function<void(TCPClient *client, std::string &)>;
-  using connectCallback = std::function<void(TCPClient *client)>;
+  using messageCallback = std::function<void(Client *client, std::string &)>;
+  using connectCallback = std::function<void(Client *client)>;
   int m_clientSocket;
   std::string m_host;
   int m_port;
@@ -36,11 +36,9 @@ class TCPClient {
   std::atomic<bool> m_isRunning{false};
   std::atomic<bool> m_isConnected{false};
 
-  bool waitForSocket(int timeout_ms, bool read);
-
  public:
-  TCPClient(const std::string &host, int port, messageCallback messageCallback, connectCallback connectCallback);
-  ~TCPClient();
+  Client(const std::string &host, int port, messageCallback messageCallback, connectCallback connectCallback);
+  ~Client();
 
   void connectServer();
   void disconnectServer();

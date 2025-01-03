@@ -8,6 +8,7 @@
 #endif
 
 #define DEFAULT_PROJECT_NAME "Default Project"
+#define DEFAULT_HARDWARE_MODEL "MS16.0.0"
 
 extern GpioManager clientGpioManager;
 

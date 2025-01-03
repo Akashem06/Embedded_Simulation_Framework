@@ -3,12 +3,17 @@
 #include "app.h"
 #include "command_code.h"
 #include "json_manager.h"
+#include "metadata.h"
 
-void applicationMessageCallback(TCPClient *client, std::string &message) {
+std::string projectName = DEFAULT_PROJECT_NAME;
+std::string hardwareModel = DEFAULT_HARDWARE_MODEL;
+
+void applicationMessageCallback(Client *client, std::string &message) {
   auto [commandCode, payload] = decodeCommand(message);
+
   switch (commandCode) {
     case CommandCode::METADATA: {
-      // TBD. Debating if server will send meta data to client?
+      /* Future expansion if the server needs to send the client some metadata? */
       break;
     }
     case CommandCode::GPIO_SET_PIN_STATE: {
@@ -47,4 +52,13 @@ void applicationMessageCallback(TCPClient *client, std::string &message) {
       break;
     }
   }
+}
+
+void applicationConnectCallback(Client *client) {
+  std::cout << "Connected :-)" << std::endl;
+
+  Datagram::Metadata::Payload initialData = {.projectName = projectName, .projectStatus = "RUNNING", .hardwareModel = hardwareModel};
+  Datagram::Metadata projectMetadata(initialData);
+
+  client->sendMessage(projectMetadata.serialize());
 }

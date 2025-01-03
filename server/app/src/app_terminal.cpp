@@ -8,7 +8,7 @@
 #include "app.h"
 #include "command_code.h"
 
-Terminal::Terminal(TCPServer *server) {
+Terminal::Terminal(Server *server) {
   m_Server = server;
 }
 

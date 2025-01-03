@@ -1,6 +1,7 @@
 #include "app_callback.h"
 
 #include <iostream>
+#include <string>
 
 #include "app.h"
 #include "command_code.h"
@@ -10,7 +11,7 @@
 #include "metadata.h"
 #include "spi_datagram.h"
 
-void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &message) {
+void applicationMessageCallback(Server *srv, ClientConnection *src, std::string &message) {
   std::string clientName = src->getClientName();
 
   auto [commandCode, payload] = decodeCommand(message);
@@ -27,7 +28,6 @@ void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &mes
                                         src->getClientName()); /* Get the updated name if there are duplicates */
       serverJSONManager.setProjectValue(src->getClientName(), "project_status", clientMetadata.getProjectStatus());
       serverJSONManager.setProjectValue(src->getClientName(), "hardware_model", clientMetadata.getHardwareModel());
-
       break;
     }
     case CommandCode::GPIO_GET_PIN_STATE: {
@@ -58,4 +58,8 @@ void applicationCallback(TCPServer *srv, ClientConnection *src, std::string &mes
       break;
     }
   }
+}
+
+void applicationConnectCallback(Server *srv, ClientConnection *src) {
+  std::cout << "Connected to new client on address: " << src->getClientAddress() << std::endl;
 }

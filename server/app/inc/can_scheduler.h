@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include <atomic>
+#include <string>
 
 class CanScheduler {
  private:

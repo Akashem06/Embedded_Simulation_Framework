@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "tcp_server.h"
+#include "server.h"
 
 std::string ClientConnection::getClientAddress() const {
   char ip_str[INET_ADDRSTRLEN];
@@ -13,50 +13,13 @@ std::string ClientConnection::getClientAddress() const {
   return std::string(ip_str);
 }
 
-ClientConnection::ClientConnection(TCPServer *server) {
+ClientConnection::ClientConnection(Server *server) {
   this->server = server;
   m_isConnected = false;
 }
 
-ClientConnection::~ClientConnection() {}
-
-void ClientConnection::monitorThreadProcedure() {
-  const int bufferSize = MAX_CLIENT_BUFFER_SIZE;
-  char buffer[bufferSize + 1];
-  int numBytes;
-
-  m_isConnected = true;
-  while (true) {
-    numBytes = read(m_clientSocket, &buffer, bufferSize);
-    if (numBytes <= 0) {
-      break;
-    }
-
-    buffer[numBytes] = '\0';
-
-    std::string msg(buffer, numBytes);
-    server->messageReceived(this, msg);
-  }
-
+ClientConnection::~ClientConnection() {
   close(m_clientSocket);
-  m_isConnected = false;
-
-  server->removeClient(this);
-}
-
-void *monitorThreadWrapper(void *param) {
-  ClientConnection *conn = static_cast<ClientConnection *>(param);
-
-  try {
-    conn->monitorThreadProcedure();
-  } catch (const std::exception &e) {
-    std::cerr << "Error in Monitor Thread Procedure: " << e.what() << std::endl;
-  } catch (...) {
-    std::cerr << "Unknown error in MonitorThreadProcedure" << std::endl;
-  }
-
-  delete conn;
-  return nullptr;
 }
 
 bool ClientConnection::acceptClient(int listeningSocket) {
@@ -68,22 +31,12 @@ bool ClientConnection::acceptClient(int listeningSocket) {
     return false;
   }
 
-  try {
-    if (m_clientName.empty()) {
-      m_clientName = getClientAddress();
-    }
+  /* Set as non blocking */
+  int flags = fcntl(m_clientSocket, F_GETFL, 0);
+  fcntl(m_clientSocket, F_SETFL, flags | O_NONBLOCK);
 
-    if (pthread_create(&m_monitorThreadId, nullptr, monitorThreadWrapper, this) < 0) {
-      throw std::runtime_error("Error creating monitor thread");
-    }
-
-    if (pthread_detach(m_monitorThreadId) != 0) {
-      throw std::runtime_error("Error detatching monitor-thread");
-    }
-  } catch (const std::exception &e) {
-    std::cerr << e.what() << std::endl;
-    close(m_clientSocket);
-    return false;
+  if (m_clientName.empty()) {
+    m_clientName = getClientAddress();
   }
 
   m_isConnected = true;
@@ -111,6 +64,13 @@ void ClientConnection::setClientName(const std::string &name) {
 
 int ClientConnection::getClientPort() const {
   return m_clientPort;
+}
+
+int ClientConnection::getSocketFd() const {
+  if (m_clientSocket < 0) {
+    throw std::runtime_error("Attempting to get invalid socket descriptor");
+  }
+  return m_clientSocket;
 }
 
 void ClientConnection::setClientPort(int port) {

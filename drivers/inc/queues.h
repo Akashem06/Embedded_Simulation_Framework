@@ -25,13 +25,27 @@
  * @{
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief   Queue private data
+ */
+typedef struct {
+  uint32_t head;
+  uint32_t tail;
+  uint32_t count;
+} QueueStorage;
+
 /**
  * @brief   Queue storage and access struct
  */
 typedef struct {
-  uint32_t num_items;   /**< Number of items the queue can hold */
-  uint32_t item_size;   /**< Size of each item */
-  uint8_t *storage_buf; /**< Must be declared statically, and have size num_items*item_size */
+  uint32_t num_items;           /**< Number of items the queue can hold */
+  uint32_t item_size;           /**< Size of each item */
+  uint8_t *storage_buf;         /**< Must be declared statically, and have size num_items*item_size */
+  QueueStorage private_storage; /**< Private queue data */
 } Queue;
 
 /**
@@ -102,6 +116,10 @@ uint32_t queue_get_num_items(Queue *queue);
  * @return  Remaining number of spaces available
  */
 uint32_t queue_get_spaces_available(Queue *queue);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 

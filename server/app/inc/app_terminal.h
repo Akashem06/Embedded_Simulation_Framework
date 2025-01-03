@@ -2,10 +2,10 @@
 #define APP_TERMINAL_H
 
 #include "client_connection.h"
-#include "tcp_server.h"
+#include "server.h"
 class Terminal {
  private:
-  TCPServer *m_Server;
+  Server *m_Server;
   ClientConnection *m_targetClient;
 
   std::string toLower(const std::string &input);
@@ -14,7 +14,7 @@ class Terminal {
   void parseCommand(std::vector<std::string> &tokens);
 
  public:
-  Terminal(TCPServer *server);
+  Terminal(Server *server);
 
   void run();
 };
