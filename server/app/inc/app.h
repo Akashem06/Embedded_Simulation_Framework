@@ -1,20 +1,39 @@
-#ifndef APP_H
-#define APP_H
+#pragma once
 
+/************************************************************************************************
+ * @file   app.h
+ *
+ * @brief  Header file defining the Application
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
+
+/* Standard library Headers */
 #include <string>
 
+/* Inter-component Headers */
+#include "json_manager.h"
+
+/* Intra-component Headers */
 #include "can_listener.h"
 #include "can_scheduler.h"
 #include "gpio_manager.h"
-#include "json_manager.h"
+
+/**
+ * @defgroup AppMain
+ * @brief    Application Main Interface
+ * @{
+ */
 
 #ifndef USE_NETWORK_TIME_PROTOCOL
+/** @brief  Define to use network-time-protocol synchronization. 0: Disabled 1: Enabled */
 #define USE_NETWORK_TIME_PROTOCOL 0U
 #endif
 
-extern JSONManager serverJSONManager;
-extern GpioManager serverGpioManager;
-extern CanListener serverCanListener;
-extern CanScheduler serverCanScheduler;
+extern JSONManager serverJSONManager;   /**< Global JSON Manager */
+extern GpioManager serverGpioManager;   /**< Global GPIO Manager */
+extern CanListener serverCanListener;   /**< Global CAN Listener */
+extern CanScheduler serverCanScheduler; /**< Global CAN Scheduler */
 
-#endif
+/** @} */

@@ -1,13 +1,25 @@
-#include "can_listener.h"
+/************************************************************************************************
+ * @file   can_message_handler.cc
+ *
+ * @brief  Source file defining the CanListener Class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
-#include <unistd.h>
-
+/* Standard library Headers */
 #include <cstring>
 #include <iostream>
 
-#include "app.h"
-#include "system_can.h"
+/* Inter-component Headers */
+#include <unistd.h>
+
 #include "thread_helpers.h"
+#include "system_can.h"
+
+/* Intra-component Headers */
+#include "can_listener.h"
+#include "app.h"
 
 #define CAN_MESSAGE_JSON_KEY "messages"
 
@@ -70,7 +82,7 @@ void CanListener::updateJSONProcedure() {
     serverJSONManager.setProjectValue(CAN_JSON_NAME, CAN_MESSAGE_JSON_KEY, m_canInfo);
     pthread_mutex_unlock(&m_mutex);
 
-    thread_sleep_ms(UPDATE_CAN_JSON_FREQUENCY_MS);
+    thread_sleep_ms(UPDATE_CAN_JSON_PERIOD_MS);
   }
 }
 

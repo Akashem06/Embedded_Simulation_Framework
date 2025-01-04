@@ -1,9 +1,21 @@
-#include "gpio_manager.h"
+/************************************************************************************************
+ * @file   gpio_manager.cc
+ *
+ * @brief  Source file defining the GpioManager Class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <cstdint>
 
-#include "app.h"
+/* Inter-component Headers */
 #include "command_code.h"
+
+/* Intra-component Headers */
+#include "app.h"
+#include "gpio_manager.h"
 
 #define GPIO_KEY "gpio"
 #define PIN_STATE_KEY "state"

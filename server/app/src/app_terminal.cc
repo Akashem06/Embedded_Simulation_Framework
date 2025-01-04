@@ -1,12 +1,24 @@
-#include "app_terminal.h"
+/************************************************************************************************
+ * @file   app_terminal.cc
+ *
+ * @brief  Source file defining the Application Terminal Class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include "app.h"
+/* Inter-component Headers */
 #include "command_code.h"
+
+/* Intra-component Headers */
+#include "app.h"
+#include "app_terminal.h"
 
 Terminal::Terminal(Server *server) {
   m_Server = server;

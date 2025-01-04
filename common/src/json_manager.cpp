@@ -16,8 +16,7 @@ void JSONManager::createDefaultProjectJSON(const std::string &projectName) {
     char timeBuffer[20];
     std::strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
 
-    nlohmann::json defaultJSON = {
-        {"project_name", projectName}, {"version", "1.0.0"}, {"created_at", std::string(timeBuffer)}, {"settings", nlohmann::json::object()}};
+    nlohmann::json defaultJSON = {{"project_name", projectName}, {"version", "1.0.0"}, {"created_at", std::string(timeBuffer)}, {"settings", nlohmann::json::object()}};
     saveProjectJSON(projectName, defaultJSON);
   } catch (const std::exception &e) {
     std::cerr << "Error creating project JSON: " << e.what() << std::endl;

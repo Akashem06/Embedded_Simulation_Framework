@@ -1,17 +1,30 @@
+/************************************************************************************************
+ * @file   main.cc
+ *
+ * @brief  Main source file
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <iostream>
 #include <string>
+
+/* Inter-component Headers */
+#include "client_connection.h"
+#include "json_manager.h"
+#include "ntp_server.h"
+#include "server.h"
+
+/* Intra-component Headers */
 
 #include "app.h"
 #include "app_callback.h"
 #include "app_terminal.h"
 #include "can_listener.h"
 #include "can_scheduler.h"
-#include "client_connection.h"
 #include "gpio_manager.h"
-#include "json_manager.h"
-#include "ntp_server.h"
-#include "server.h"
 
 JSONManager serverJSONManager;
 GpioManager serverGpioManager;
