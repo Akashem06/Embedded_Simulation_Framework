@@ -1,10 +1,21 @@
-#include "client_connection.h"
+/************************************************************************************************
+ * @file   client_connection.cc
+ *
+ * @brief  Source file defining the ClientConnection class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
+#include <iostream>
+
+/* Inter-component Headers */
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <iostream>
-
+/* Intra-component Headers */
+#include "client_connection.h"
 #include "server.h"
 
 std::string ClientConnection::getClientAddress() const {
@@ -71,10 +82,6 @@ int ClientConnection::getSocketFd() const {
     throw std::runtime_error("Attempting to get invalid socket descriptor");
   }
   return m_clientSocket;
-}
-
-void ClientConnection::setClientPort(int port) {
-  m_clientPort = port;
 }
 
 bool ClientConnection::isConnected() {

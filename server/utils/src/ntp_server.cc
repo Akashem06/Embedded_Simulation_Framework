@@ -1,9 +1,21 @@
-#include "ntp_server.h"
+/************************************************************************************************
+ * @file   ntp_server.cc
+ *
+ * @brief  Source file defining the NTPServer class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
+#include <iostream>
+#include <cstring>
+
+/* Inter-component Headers */
 #include <netdb.h>
 
-#include <cstring>
-#include <iostream>
+/* Intra-component Headers */
+#include "ntp_server.h"
 
 bool NTPServer::queryNTPServer(NTPPacket &response) {
   struct addrinfo hints = {}, *addrs;

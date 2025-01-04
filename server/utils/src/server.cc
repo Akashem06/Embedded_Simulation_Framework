@@ -1,10 +1,23 @@
-#include "server.h"
+/************************************************************************************************
+ * @file   server.cc
+ *
+ * @brief  Source file defining the Server class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
+#include <iostream>
 #include <string.h>
+#include <cstring>
+
+/* Inter-component Headers */
 #include <unistd.h>
 
-#include <cstring>
-#include <iostream>
+/* Intra-component Headers */
+#include "client_connection.h"
+#include "server.h"
 
 Server::Server() {
   m_serverListening = false;
@@ -41,10 +54,10 @@ void Server::listenNewClientsProcedure() {
   listen(m_listeningSocket, 5);
 
   while (m_serverListening) {
-    ClientConnection *conn = new ClientConnection(this);
+    ClientConnection *client = new ClientConnection(this);
 
-    if (!conn->acceptClient(m_listeningSocket)) {
-      delete conn;
+    if (!client->acceptClient(m_listeningSocket)) {
+      delete client;
       break;
     }
 
@@ -53,18 +66,19 @@ void Server::listenNewClientsProcedure() {
 
     /* Edge-triggered input */
     clientEvent.events = EPOLLIN | EPOLLET;
-    clientEvent.data.ptr = conn;
+    clientEvent.data.ptr = client;
 
-    if (epoll_ctl(m_epollFd, EPOLL_CTL_ADD, conn->getSocketFd(), &clientEvent) < 0) {
-      conn->~ClientConnection();
+    if (epoll_ctl(m_epollFd, EPOLL_CTL_ADD, client->getSocketFd(), &clientEvent) < 0) {
+      client->~ClientConnection();
       throw std::runtime_error("Failed to add client connection to EPOLL Interest list");
+      break;
     }
 
     if (m_connectCallback) {
-      m_connectCallback(this, conn);
+      m_connectCallback(this, client);
     }
 
-    updateClientName(conn, conn->getClientName());
+    updateClientName(client, client->getClientName());
   }
 
   m_serverListening = false;
@@ -85,7 +99,7 @@ void Server::epollClientsProcedure() {
 
     if (nfds < 0) {
       throw std::runtime_error("EPOLL wait failed");
-      continue;
+      break;
     }
 
     for (int i = 0; i < nfds; i++) {
@@ -96,7 +110,7 @@ void Server::epollClientsProcedure() {
 
         if (numBytes < 0) {
           throw std::runtime_error("EPOLL Read failed");
-          continue;
+          break;
         }
 
         buffer[numBytes] = '\0';
@@ -105,6 +119,8 @@ void Server::epollClientsProcedure() {
       }
     }
   }
+
+  m_serverListening = false;
 }
 
 void *listenNewClientsWrapper(void *param) {
@@ -113,7 +129,6 @@ void *listenNewClientsWrapper(void *param) {
   try {
     server->listenNewClientsProcedure();
   } catch (std::exception &e) {
-    m_serverListening = false;
     std::cerr << "Listen Thread Error: " << e.what() << std::endl;
   }
 
@@ -125,7 +140,6 @@ void *epollClientsWrapper(void *param) {
   try {
     server->epollClientsProcedure();
   } catch (std::exception &e) {
-    m_serverListening = false;
     std::cerr << "EPOLL Clients Error: " << e.what() << std::endl;
   }
   return nullptr;
@@ -154,26 +168,26 @@ void Server::listenClients(int port, messageCallback messageCallback, connectCal
   }
 }
 
-void Server::removeClient(ClientConnection *conn) {
+void Server::removeClient(ClientConnection *client) {
   pthread_mutex_lock(&m_mutex);
-  if (conn) {
-    std::cerr << "Removed client: " << conn->getClientName() << std::endl;
-    epoll_ctl(m_epollFd, EPOLL_CTL_DEL, conn->getSocketFd(), nullptr);
-    m_connections.erase(conn->getClientName());
-    conn->~ClientConnection();
+  if (client) {
+    std::cerr << "Removed client: " << client->getClientName() << std::endl;
+    epoll_ctl(m_epollFd, EPOLL_CTL_DEL, client->getSocketFd(), nullptr);
+    m_connections.erase(client->getClientName());
+    client->~ClientConnection();
   }
   pthread_mutex_unlock(&m_mutex);
 }
 
-void Server::updateClientName(ClientConnection *conn, std::string newName) {
+void Server::updateClientName(ClientConnection *client, std::string newName) {
   pthread_mutex_lock(&m_mutex);
-  std::string oldClientName = conn->getClientName();
+  std::string oldClientName = client->getClientName();
 
   if (!oldClientName.empty()) {
     m_connections.erase(oldClientName);
   }
 
-  conn->setClientName(newName);
+  client->setClientName(newName);
 
   /* Handle potential client duplicates */
   std::string clientName = newName;
@@ -183,17 +197,17 @@ void Server::updateClientName(ClientConnection *conn, std::string newName) {
     clientDuplicateCount++;
   }
 
-  m_connections[clientName] = conn;
-  conn->setClientName(clientName);
+  m_connections[clientName] = client;
+  client->setClientName(clientName);
   pthread_mutex_unlock(&m_mutex);
 }
 
-void Server::messageReceived(ClientConnection *src, std::string &message) {
-  m_messageCallback(this, src, message);
+void Server::messageReceived(ClientConnection *client, std::string &message) {
+  m_messageCallback(this, client, message);
 }
 
-void Server::sendMessage(ClientConnection *dst, const std::string &message) {
-  dst->sendMessage(message);
+void Server::sendMessage(ClientConnection *client, const std::string &message) {
+  client->sendMessage(message);
 }
 
 void Server::broadcastMessage(const std::string &message) {
