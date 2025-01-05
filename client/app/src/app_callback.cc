@@ -1,9 +1,22 @@
-#include "app_callback.h"
+/************************************************************************************************
+ * @file   app_callback.cc
+ *
+ * @brief  Source file defining the Application Callbacks for the client
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
-#include "app.h"
+/* Standard library Headers */
+
+/* Inter-component Headers */
 #include "command_code.h"
 #include "json_manager.h"
 #include "metadata.h"
+
+/* Intra-component Headers */
+#include "app.h"
+#include "app_callback.h"
 
 std::string projectName = DEFAULT_PROJECT_NAME;
 std::string hardwareModel = DEFAULT_HARDWARE_MODEL;

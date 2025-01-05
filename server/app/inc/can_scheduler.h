@@ -43,67 +43,64 @@
  */
 class CanScheduler {
  private:
-  const std::string CAN_INTERFACE_NAME = "vcan0";                   /**< SocketCAN interface name */
+  const std::string CAN_INTERFACE_NAME = "vcan0"; /**< SocketCAN interface name */
 
   static const constexpr unsigned int FAST_CYCLE_SPEED_MS = 1U;     /**< CAN fast cycle period in milliseconds */
   static const constexpr unsigned int MEDIUM_CYCLE_SPEED_MS = 100U; /**< CAN medium cycle period in milliseconds */
   static const constexpr unsigned int SLOW_CYCLE_SPEED_MS = 1000U;  /**< CAN slow cycle period in milliseconds */
 
-  static const constexpr unsigned int SLOW_CYCLE_BCM_ID = 0U;       /**< Linux Broadcast Manager Id for tracking fast cycle messages */
-  static const constexpr unsigned int MEDIUM_CYCLE_BCM_ID = 1U;     /**< Linux Broadcast Manager Id for tracking medium cycle messages */
-  static const constexpr unsigned int FAST_CYCLE_BCM_ID = 2U;       /**< Linux Broadcast Manager Id for tracking slow cycle messages */
+  static const constexpr unsigned int SLOW_CYCLE_BCM_ID = 0U;   /**< Linux Broadcast Manager Id for tracking fast cycle messages */
+  static const constexpr unsigned int MEDIUM_CYCLE_BCM_ID = 1U; /**< Linux Broadcast Manager Id for tracking medium cycle messages */
+  static const constexpr unsigned int FAST_CYCLE_BCM_ID = 2U;   /**< Linux Broadcast Manager Id for tracking slow cycle messages */
 
-  static const constexpr unsigned int NUM_FAST_CYCLE_MESSAGES = 3U; /**< Number of fast cycle messages */
+  static const constexpr unsigned int NUM_FAST_CYCLE_MESSAGES = 3U;   /**< Number of fast cycle messages */
   static const constexpr unsigned int NUM_MEDIUM_CYCLE_MESSAGES = 5U; /**< Number of medium cycle messages */
-  static const constexpr unsigned int NUM_SLOW_CYCLE_MESSAGES = 5U; /**< Number of slow cycle messages */
-  static const constexpr unsigned int NUM_TOTAL_MESSAGES = 13U; /**< Total number of messages */
-  static const constexpr unsigned int MAX_MESSAGE_LENGTH = 8U; /**< Max message length in bytes */
+  static const constexpr unsigned int NUM_SLOW_CYCLE_MESSAGES = 5U;   /**< Number of slow cycle messages */
+  static const constexpr unsigned int NUM_TOTAL_MESSAGES = 13U;       /**< Total number of messages */
+  static const constexpr unsigned int MAX_MESSAGE_LENGTH = 8U;        /**< Max message length in bytes */
 
-  
-  static const constexpr unsigned int FAST_BMS_CARRIER_BATTERY_VT_FRAME_INDEX = 0U; /**< Broadcast Manager battery_vt to Frame index mapping */
+  static const constexpr unsigned int FAST_BMS_CARRIER_BATTERY_VT_FRAME_INDEX = 0U;              /**< Broadcast Manager battery_vt to Frame index mapping */
   static const constexpr unsigned int FAST_CAN_COMMUNICATION_FAST_ONE_SHOT_MSG_FRAME_INDEX = 1U; /**< Broadcast Manager fast_one_shot_msg to Frame index mapping */
-  static const constexpr unsigned int FAST_CENTRE_CONSOLE_CC_PEDAL_FRAME_INDEX = 2U; /**< Broadcast Manager cc_pedal to Frame index mapping */
+  static const constexpr unsigned int FAST_CENTRE_CONSOLE_CC_PEDAL_FRAME_INDEX = 2U;             /**< Broadcast Manager cc_pedal to Frame index mapping */
 
-  
-  static const constexpr unsigned int MEDIUM_BMS_CARRIER_BATTERY_STATUS_FRAME_INDEX = 0U; /**< Broadcast Manager battery_status to Frame index mapping */
+  static const constexpr unsigned int MEDIUM_BMS_CARRIER_BATTERY_STATUS_FRAME_INDEX = 0U;            /**< Broadcast Manager battery_status to Frame index mapping */
   static const constexpr unsigned int MEDIUM_CAN_COMMUNICATION_MEDIUM_ONE_SHOT_MSG_FRAME_INDEX = 1U; /**< Broadcast Manager medium_one_shot_msg to Frame index mapping */
-  static const constexpr unsigned int MEDIUM_CENTRE_CONSOLE_CC_INFO_FRAME_INDEX = 2U; /**< Broadcast Manager cc_info to Frame index mapping */
-  static const constexpr unsigned int MEDIUM_CENTRE_CONSOLE_CC_STEERING_FRAME_INDEX = 3U; /**< Broadcast Manager cc_steering to Frame index mapping */
-  static const constexpr unsigned int MEDIUM_CENTRE_CONSOLE_CC_REGEN_PERCENTAGE_FRAME_INDEX = 4U; /**< Broadcast Manager cc_regen_percentage to Frame index mapping */
+  static const constexpr unsigned int MEDIUM_CENTRE_CONSOLE_CC_INFO_FRAME_INDEX = 2U;                /**< Broadcast Manager cc_info to Frame index mapping */
+  static const constexpr unsigned int MEDIUM_CENTRE_CONSOLE_CC_STEERING_FRAME_INDEX = 3U;            /**< Broadcast Manager cc_steering to Frame index mapping */
+  static const constexpr unsigned int MEDIUM_CENTRE_CONSOLE_CC_REGEN_PERCENTAGE_FRAME_INDEX = 4U;    /**< Broadcast Manager cc_regen_percentage to Frame index mapping */
 
-  
-  static const constexpr unsigned int SLOW_BMS_CARRIER_BATTERY_INFO_FRAME_INDEX = 0U; /**< Broadcast Manager battery_info to Frame index mapping */
-  static const constexpr unsigned int SLOW_BMS_CARRIER_AFE1_STATUS_FRAME_INDEX = 1U; /**< Broadcast Manager afe1_status to Frame index mapping */
-  static const constexpr unsigned int SLOW_BMS_CARRIER_AFE2_STATUS_FRAME_INDEX = 2U; /**< Broadcast Manager afe2_status to Frame index mapping */
-  static const constexpr unsigned int SLOW_BMS_CARRIER_AFE3_STATUS_FRAME_INDEX = 3U; /**< Broadcast Manager afe3_status to Frame index mapping */
+  static const constexpr unsigned int SLOW_BMS_CARRIER_BATTERY_INFO_FRAME_INDEX = 0U;            /**< Broadcast Manager battery_info to Frame index mapping */
+  static const constexpr unsigned int SLOW_BMS_CARRIER_AFE1_STATUS_FRAME_INDEX = 1U;             /**< Broadcast Manager afe1_status to Frame index mapping */
+  static const constexpr unsigned int SLOW_BMS_CARRIER_AFE2_STATUS_FRAME_INDEX = 2U;             /**< Broadcast Manager afe2_status to Frame index mapping */
+  static const constexpr unsigned int SLOW_BMS_CARRIER_AFE3_STATUS_FRAME_INDEX = 3U;             /**< Broadcast Manager afe3_status to Frame index mapping */
   static const constexpr unsigned int SLOW_CAN_COMMUNICATION_SLOW_ONE_SHOT_MSG_FRAME_INDEX = 4U; /**< Broadcast Manager slow_one_shot_msg to Frame index mapping */
 
   /**
    * @brief   Fast cycle Broadcast Manager message for the Linux Kernel
    */
   struct {
-    struct bcm_msg_head msg_head;                       /**< Broadcast Manager message head containing metadata */
-    struct can_frame frame[NUM_FAST_CYCLE_MESSAGES];    /**< CAN message frames that shall be scheduled for fast cycle */
+    struct bcm_msg_head msg_head;                    /**< Broadcast Manager message head containing metadata */
+    struct can_frame frame[NUM_FAST_CYCLE_MESSAGES]; /**< CAN message frames that shall be scheduled for fast cycle */
   } canFastCycleBCM;
 
   /**
    * @brief   Medium cycle Broadcast Manager message for the Linux Kernel
    */
   struct {
-    struct bcm_msg_head msg_head;                       /**< Broadcast Manager message head containing metadata */
-    struct can_frame frame[NUM_MEDIUM_CYCLE_MESSAGES];  /**< CAN message frames that shall be scheduled for medium cycle */
+    struct bcm_msg_head msg_head;                      /**< Broadcast Manager message head containing metadata */
+    struct can_frame frame[NUM_MEDIUM_CYCLE_MESSAGES]; /**< CAN message frames that shall be scheduled for medium cycle */
   } canMediumCycleBCM;
 
   /**
    * @brief   Slow cycle Broadcast Manager message for the Linux Kernel
    */
   struct {
-    struct bcm_msg_head msg_head;                       /**< Broadcast Manager message head containing metadata */
-    struct can_frame frame[NUM_SLOW_CYCLE_MESSAGES];    /**< CAN message frames that shall be scheduled for slow cycle */
+    struct bcm_msg_head msg_head;                    /**< Broadcast Manager message head containing metadata */
+    struct can_frame frame[NUM_SLOW_CYCLE_MESSAGES]; /**< CAN message frames that shall be scheduled for slow cycle */
   } canSlowCycleBCM;
 
-  int m_bcmCanSocket;               /**< The CAN schedulers Broadcast Manager socket FD */
-  std::atomic<bool> m_isConnected;  /**< Boolean flag to track the CAN schedulers connection status */
+  int m_bcmCanSocket;              /**< The CAN schedulers Broadcast Manager socket FD */
+  std::atomic<bool> m_isConnected; /**< Boolean flag to track the CAN schedulers connection status */
 
   /**
    * @brief   Schedules all CAN data by updating the Broacast Manager socket

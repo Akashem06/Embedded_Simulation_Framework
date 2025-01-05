@@ -1,9 +1,21 @@
-#include "ntp_client.h"
+/************************************************************************************************
+ * @file   ntp_client.cc
+ *
+ * @brief  Source file defining the NTPClient class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <cstring>
 #include <iostream>
 
+/* Inter-component Headers */
 #include "thread_helpers.h"
+
+/* Intra-component Headers */
+#include "ntp_client.h"
 
 void NTPClient::NTPClientProcedure() {
   int ntpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);

@@ -1,12 +1,23 @@
-#include "client.h"
+/************************************************************************************************
+ * @file   client.cc
+ *
+ * @brief  Source file defining the Client class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <cstring>
 #include <iostream>
 
-#define MAX_PACKET_SIZE 256U
+/* Inter-component Headers */
 
-void Client::processMessages() {
-  while (m_isRunning) {
+/* Intra-component Headers */
+#include "client.h"
+
+void Client::processMessagesProcedure() {
+  while (m_isConnected) {
     /* Wait for new data */
     sem_wait(&m_messageSemaphore);
 
@@ -25,8 +36,8 @@ void Client::processMessages() {
 }
 
 void Client::receiverProcedure() {
-  while (m_isRunning) {
-    std::string message(MAX_PACKET_SIZE, '\0');
+  while (m_isConnected) {
+    std::string message(MAX_BUFFER_SIZE, '\0');
 
     size_t bytesRead = read(m_clientSocket, &message[0], sizeof(message));
     if (bytesRead <= 0) {
@@ -45,11 +56,11 @@ void Client::receiverProcedure() {
   }
 }
 
-void *processMessagesThread(void *param) {
+void *processMessagesProcedureWrapper(void *param) {
   Client *client = static_cast<Client *>(param);
 
   try {
-    client->processMessages();
+    client->processMessagesProcedure();
   } catch (...) {
     std::cerr << "Process Messages Thread Error" << std::endl;
   }
@@ -89,7 +100,6 @@ void Client::connectServer() {
       throw std::runtime_error("Error connecting socket");
     }
 
-    m_isRunning = true;
     m_isConnected = true;
 
     if (m_connectCallback) {
@@ -101,7 +111,7 @@ void Client::connectServer() {
       throw std::runtime_error("Failed to create receiver thread");
     }
 
-    if (pthread_create(&m_processMessageThreadId, NULL, processMessagesThread, this)) {
+    if (pthread_create(&m_processMessageThreadId, NULL, processMessagesProcedureWrapper, this)) {
       close(m_clientSocket);
       throw std::runtime_error("Failed to create process messages thread");
     }
@@ -112,6 +122,7 @@ void Client::connectServer() {
 }
 
 void Client::disconnectServer() {
+  m_isConnected = false;
   close(m_clientSocket);
   m_clientSocket = 0;
 }
@@ -120,15 +131,6 @@ void Client::sendMessage(const std::string &message) {
   int n = send(m_clientSocket, message.c_str(), message.size(), 0);
   if (n < 0)
     throw std::runtime_error("Error sending message");
-}
-
-std::string Client::receiveMessage() {
-  std::string message(MAX_PACKET_SIZE, '\0');
-
-  int n = read(m_clientSocket, &message[0], MAX_PACKET_SIZE);
-  message[n] = '\0';
-
-  return message;
 }
 
 bool Client::isConnected() const {

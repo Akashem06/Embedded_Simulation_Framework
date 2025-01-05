@@ -1,7 +1,7 @@
 /************************************************************************************************
  * @file   gpio_manager.cc
  *
- * @brief  Source file defining the GpioManager Class
+ * @brief  Source file defining the GpioManager Class for the server
  *
  * @date   2025-01-04
  * @author Aryan Kashem

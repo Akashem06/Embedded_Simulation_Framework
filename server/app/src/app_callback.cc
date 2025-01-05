@@ -1,7 +1,7 @@
 /************************************************************************************************
  * @file   app_callback.cc
  *
- * @brief  Source file defining the Application Callbacks
+ * @brief  Source file defining the Application Callbacks for the server
  *
  * @date   2025-01-04
  * @author Aryan Kashem
@@ -23,8 +23,8 @@
 #include "app.h"
 #include "app_callback.h"
 
-void applicationMessageCallback(Server *srv, ClientConnection *src, std::string &message) {
-  std::string clientName = src->getClientName();
+void applicationMessageCallback(Server *server, ClientConnection *client, std::string &message) {
+  std::string clientName = client->getClientName();
 
   auto [commandCode, payload] = decodeCommand(message);
   switch (commandCode) {
@@ -32,14 +32,14 @@ void applicationMessageCallback(Server *srv, ClientConnection *src, std::string 
       Datagram::Metadata clientMetadata;
       clientMetadata.deserialize(payload);
 
-      if (src->getClientName() != clientMetadata.getProjectName()) {
-        srv->updateClientName(src, clientMetadata.getProjectName());
+      if (client->getClientName() != clientMetadata.getProjectName()) {
+        server->updateClientName(client, clientMetadata.getProjectName());
       }
 
-      serverJSONManager.setProjectValue(src->getClientName(), "project_name",
-                                        src->getClientName()); /* Get the updated name if there are duplicates */
-      serverJSONManager.setProjectValue(src->getClientName(), "project_status", clientMetadata.getProjectStatus());
-      serverJSONManager.setProjectValue(src->getClientName(), "hardware_model", clientMetadata.getHardwareModel());
+      serverJSONManager.setProjectValue(client->getClientName(), "project_name",
+                                        client->getClientName()); /* Get the updated name if there are duplicates */
+      serverJSONManager.setProjectValue(client->getClientName(), "project_status", clientMetadata.getProjectStatus());
+      serverJSONManager.setProjectValue(client->getClientName(), "hardware_model", clientMetadata.getHardwareModel());
       break;
     }
     case CommandCode::GPIO_GET_PIN_STATE: {
@@ -72,6 +72,6 @@ void applicationMessageCallback(Server *srv, ClientConnection *src, std::string 
   }
 }
 
-void applicationConnectCallback(Server *srv, ClientConnection *src) {
-  std::cout << "Connected to new client on address: " << src->getClientAddress() << std::endl;
+void applicationConnectCallback(Server *server, ClientConnection *client) {
+  std::cout << "Connected to new client on address: " << client->getClientAddress() << std::endl;
 }

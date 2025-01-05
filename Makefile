@@ -39,8 +39,8 @@ CAN_INC_DIR 			= $(CAN_DIR)/inc
 COMMON_SRCS := $(wildcard $(COMMON_DIR)/src/*.cpp)
 SERVER_APP_SRCS := $(wildcard $(SERVER_DIR)/app/src/*.cc)
 SERVER_UTILS_SRCS := $(wildcard $(SERVER_DIR)/utils/src/*.cc)
-CLIENT_APP_SRCS := $(wildcard $(CLIENT_DIR)/app/src/*.cpp)
-CLIENT_UTILS_SRCS := $(wildcard $(CLIENT_DIR)/utils/src/*.cpp)
+CLIENT_APP_SRCS := $(wildcard $(CLIENT_DIR)/app/src/*.cc)
+CLIENT_UTILS_SRCS := $(wildcard $(CLIENT_DIR)/utils/src/*.cc)
 DRIVERS_SRCS := $(wildcard $(DRIVERS_DIR)/src/*.c)
 CAN_SRCS := $(wildcard $(CAN_DIR)/src/*.c)
 
@@ -48,8 +48,8 @@ CAN_SRCS := $(wildcard $(CAN_DIR)/src/*.c)
 COMMON_OBJS := $(patsubst $(COMMON_DIR)/src/%.cpp,$(BUILD_DIR)/common/%.o,$(COMMON_SRCS))
 SERVER_APP_OBJS := $(patsubst $(SERVER_DIR)/app/src/%.cc,$(BUILD_DIR)/server/app/%.o,$(SERVER_APP_SRCS))
 SERVER_UTILS_OBJS := $(patsubst $(SERVER_DIR)/utils/src/%.cc,$(BUILD_DIR)/server/utils/%.o,$(SERVER_UTILS_SRCS))
-CLIENT_APP_OBJS := $(patsubst $(CLIENT_DIR)/app/src/%.cpp,$(BUILD_DIR)/client/app/%.o,$(CLIENT_APP_SRCS))
-CLIENT_UTILS_OBJS := $(patsubst $(CLIENT_DIR)/utils/src/%.cpp,$(BUILD_DIR)/client/utils/%.o,$(CLIENT_UTILS_SRCS))
+CLIENT_APP_OBJS := $(patsubst $(CLIENT_DIR)/app/src/%.cc,$(BUILD_DIR)/client/app/%.o,$(CLIENT_APP_SRCS))
+CLIENT_UTILS_OBJS := $(patsubst $(CLIENT_DIR)/utils/src/%.cc,$(BUILD_DIR)/client/utils/%.o,$(CLIENT_UTILS_SRCS))
 DRIVERS_OBJS := $(patsubst $(DRIVERS_DIR)/src/%.c,$(BUILD_DIR)/drivers/%.o,$(DRIVERS_SRCS))
 CAN_OBJS := $(patsubst $(CAN_DIR)/src/%.c,$(BUILD_DIR)/can/%.o,$(CAN_SRCS))
 
@@ -104,11 +104,11 @@ $(BUILD_DIR)/server/utils/%.o: $(SERVER_UTILS_SRC_DIR)/%.cc | $(BUILD_DIR)
 	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(SERVER_APP_INC_DIR) -I$(SERVER_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -c $< -o $@
 
-$(BUILD_DIR)/client/app/%.o: $(CLIENT_APP_SRC_DIR)/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/client/app/%.o: $(CLIENT_APP_SRC_DIR)/%.cc | $(BUILD_DIR)
 	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(CLIENT_APP_INC_DIR) -I$(CLIENT_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -I$(DRIVERS_INC_DIR) -I$(CAN_INC_DIR) -c $< -o $@
 
-$(BUILD_DIR)/client/utils/%.o: $(CLIENT_UTILS_SRC_DIR)/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/client/utils/%.o: $(CLIENT_UTILS_SRC_DIR)/%.cc | $(BUILD_DIR)
 	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(CLIENT_APP_INC_DIR) -I$(CLIENT_UTILS_INC_DIR) -I$(COMMON_INC_DIR) -c $< -o $@
 

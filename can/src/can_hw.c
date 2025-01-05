@@ -8,6 +8,8 @@
  ************************************************************************************************/
 
 /* Standard library Headers */
+
+/* Inter-component Headers */
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <linux/can.h>
@@ -19,7 +21,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-/* Inter-component Headers */
 #include "log.h"
 
 /* Intra-component Headers */

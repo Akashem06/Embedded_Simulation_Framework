@@ -46,7 +46,10 @@ class Server {
   static const constexpr unsigned int MAX_SERVER_EPOLL_EVENTS = 64U; /**< Maximum permitted EPOLL events for tracking clients */
   static const constexpr size_t MAX_CLIENT_READ_SIZE = 256U;         /**< Maximum permitted read size for all clients */
 
-  pthread_mutex_t m_mutex;           /**< Mutex to protect m_connections map */
+  pthread_t m_listenNewClientsId; /**< Thread Id for listening to new clients */
+  pthread_t m_epollClientsId;     /**< Thread Id for reading incoming client data */
+  pthread_mutex_t m_mutex;        /**< Mutex to protect m_connections map */
+
   messageCallback m_messageCallback; /**< Function pointer to store the message callback */
   connectCallback m_connectCallback; /**< Function pointer to store the connection callback */
 
@@ -61,9 +64,6 @@ class Server {
   int m_epollFd;                                             /**< The servers EPOLL FD to manage reading all clients */
   struct epoll_event m_epollEvents[MAX_SERVER_EPOLL_EVENTS]; /**< An array to store all EPOLL events as bitmasks */
 
-  pthread_t m_listenNewClientsId; /**< Thread Id for listening to new clients */
-  pthread_t m_epollClientsId;     /**< Thread Id for reading incoming client data */
-
  public:
   /**
    * @brief   Constructs a Server object
@@ -73,8 +73,8 @@ class Server {
   Server();
 
   /**
-   * @brief   Destructs a ClientConnection object
-   * @details If using TCP this closes the existing socket connection
+   * @brief   Destructs a Server object
+   * @details If using TCP this closes all existing socket connections
    *          This shall also delete the mutex, and terminate both running threads
    */
   ~Server();
@@ -89,7 +89,7 @@ class Server {
   void listenNewClientsProcedure();
 
   /**
-   * @brief   Thread procedure for listening for reading incoming client data
+   * @brief   Thread procedure for reading incoming client data
    * @details This thread shall be blocked while no new client data is available
    *          Upon receiving a message, the message callback shall be called
    */

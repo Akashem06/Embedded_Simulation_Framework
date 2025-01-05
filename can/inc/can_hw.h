@@ -1,5 +1,4 @@
-#ifndef CAN_HW_H
-#define CAN_HW_H
+#pragma once
 
 /************************************************************************************************
  * @file   can_hw.h
@@ -123,5 +122,3 @@ void can_hw_transmit(uint32_t id, bool extended, const uint8_t *data, size_t len
 bool can_hw_receive(uint32_t *id, bool *extended, uint64_t *data, size_t *len);
 
 /** @} */
-
-#endif

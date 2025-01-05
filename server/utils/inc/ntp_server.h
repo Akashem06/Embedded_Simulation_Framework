@@ -41,7 +41,7 @@
 class NTPServer {
  private:
   static constexpr int NTP_PORT = 123;                   /**< Universal port for network-time-protocol */
-  static constexpr unsigned int NTP_SYNC_PERIOD_S = 60U; /**< Client synchronizaiton period */
+  static constexpr unsigned int NTP_SYNC_PERIOD_S = 60U; /**< Client synchronization period */
 
   int m_NTPSocket;                 /**< The NTP servers socket FD */
   std::string m_bindAddress;       /**< The NTP servers bind address */
@@ -81,8 +81,8 @@ class NTPServer {
   void NTPServerProcedure();
 
   /**
-   * @brief   Thread procedure for handling NTP synchronization
-   * @details This thread shall run at the NTP_SYNC_PERIOD_S frequency
+   * @brief   Starts listening to NTP clients to begin synchronization
+   * @details This function will spawn the NTPServerProcedure thread
    * @param   bindAddress The local address to bind the NTP server
    * @param   NTPServerAddress The external NTP server address to query for time data
    */

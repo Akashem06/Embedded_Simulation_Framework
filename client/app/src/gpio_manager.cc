@@ -1,12 +1,26 @@
-extern "C" {
-#include "gpio.h"
-}
+/************************************************************************************************
+ * @file   gpio_manager.cc
+ *
+ * @brief  Source file defining the GpioManager class for the client
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
+
+/* Standard library Headers */
 #include <cstdint>
 #include <iostream>
 #include <vector>
 
-#include "app.h"
+/* Inter-component Headers */
+extern "C" {
+#include "gpio.h"
+}
+
 #include "command_code.h"
+
+/* Intra-component Headers */
+#include "app.h"
 #include "gpio_manager.h"
 
 void GpioManager::setGpioPinState(std::string &payload) {

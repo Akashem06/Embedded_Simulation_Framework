@@ -1,7 +1,7 @@
 /************************************************************************************************
  * @file   i2c_manager.cc
  *
- * @brief  Source file defining the I2CManager Class
+ * @brief  Source file defining the I2CManager Class for the server
  *
  * @date   2025-01-04
  * @author Aryan Kashem
