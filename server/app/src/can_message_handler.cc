@@ -3,7 +3,7 @@
  *
  * @brief  Source file defining the Can Message Handler function
  *
- * @date   2025-01-04
+ * @date   2025-01-05
  * @author Aryan Kashem
  ************************************************************************************************/
 

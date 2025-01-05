@@ -18,7 +18,6 @@
 #include "server.h"
 
 /* Intra-component Headers */
-
 #include "app.h"
 #include "app_callback.h"
 #include "app_terminal.h"

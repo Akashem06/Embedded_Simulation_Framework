@@ -1,10 +1,23 @@
+/************************************************************************************************
+ * @file   main.cc
+ *
+ * @brief  Main source file
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
+
+/* Standard library Headers */
 #include <iostream>
 
+/* Inter-component Headers */
+#include "client.h"
+#include "ntp_client.h"
+
+/* Intra-component Headers */
 #include "app.h"
 #include "app_callback.h"
-#include "client.h"
 #include "gpio_manager.h"
-#include "ntp_client.h"
 
 GpioManager clientGpioManager;
 

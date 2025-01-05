@@ -29,7 +29,7 @@
 /**
  * @class   GpioManager
  * @brief   Class that manages receiving and transmitting Gpio commands and JSON logging
- * @details This class is responsible transmitting serialized messages for reading pin modes,
+ * @details This class is responsible for transmitting serialized messages for reading pin modes,
  *          alternate functions and states. It shall support reading all pins or individual pins
  *          The class shall cache current Gpio data using a hash-map
  */

@@ -135,6 +135,7 @@ class CanScheduler {
   {%- for signal in message.signals %}
   /**
    * @brief   Update the CAN value for {{ message.name | lower }} {{ signal.name | lower }}
+   * @param   {{ signal.name | lower }}_value New value for the signal
    */
   void update_{{ message.name | lower }}_{{ signal.name | lower }}(uint{{ signal.length }}_t {{ signal.name | lower }}_value);
   {%- endfor %}

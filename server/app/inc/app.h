@@ -3,7 +3,7 @@
 /************************************************************************************************
  * @file   app.h
  *
- * @brief  Header file defining the Application
+ * @brief  Header file defining the Application for the server
  *
  * @date   2025-01-04
  * @author Aryan Kashem
@@ -21,8 +21,8 @@
 #include "gpio_manager.h"
 
 /**
- * @defgroup AppMain
- * @brief    Application Main Interface
+ * @defgroup ServerAppMain
+ * @brief    Server Application Main Interface
  * @{
  */
 

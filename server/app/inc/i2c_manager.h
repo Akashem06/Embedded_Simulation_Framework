@@ -25,9 +25,9 @@
  */
 
 /**
- * @class   I2CManager
+ * @class   ServerI2CManager
  * @brief   Class that manages receiving and transmitting I2C commands and JSON logging
- * @details This class is responsible transmitting serialized messages for setting/retrieving RX/TX data buffers
+ * @details This class is responsible for transmitting serialized messages for setting/retrieving RX/TX data buffers
  *          The class shall provide an interface to control I2C transactions
  */
 class I2CManager {
