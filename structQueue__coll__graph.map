@@ -1,0 +1,4 @@
+<map id="Queue" name="Queue">
+<area shape="rect" id="node1" title="Queue storage and access struct." alt="" coords="31,93,95,119"/>
+<area shape="rect" id="node2" href="$structQueueStorage.html" title="Queue private data." alt="" coords="5,5,120,31"/>
+</map>
