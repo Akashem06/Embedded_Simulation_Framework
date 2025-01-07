@@ -3,7 +3,7 @@
  *
  * @brief  Source file defining the Can Message Handler function
  *
- * @date   2025-01-05
+ * @date   2025-01-07
  * @author Aryan Kashem
  ************************************************************************************************/
 
@@ -24,12 +24,19 @@
 #include "can_listener.h"
 
 
+/**
+ * @brief   Storage class for battery_status CAN message
+ */
 struct battery_status {
-  uint16_t fault;
-  uint16_t fault_val;
-  uint16_t aux_batt_v;
-  uint8_t afe_status;
+  uint16_t fault; /**< CAN signal 'fault' defined in *.yaml */
+  uint16_t fault_val; /**< CAN signal 'fault_val' defined in *.yaml */
+  uint16_t aux_batt_v; /**< CAN signal 'aux_batt_v' defined in *.yaml */
+  uint8_t afe_status; /**< CAN signal 'afe_status' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for battery_status
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -66,6 +73,9 @@ struct battery_status {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for battery_status using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"fault", fault},
@@ -75,16 +85,27 @@ struct battery_status {
     };
   }
 
+  /**
+   * @brief   Get the message name: battery_status
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "battery_status";
   }
 };
+/**
+ * @brief   Storage class for battery_vt CAN message
+ */
 struct battery_vt {
-  uint16_t voltage;
-  uint16_t current;
-  uint16_t temperature;
-  uint16_t batt_perc;
+  uint16_t voltage; /**< CAN signal 'voltage' defined in *.yaml */
+  uint16_t current; /**< CAN signal 'current' defined in *.yaml */
+  uint16_t temperature; /**< CAN signal 'temperature' defined in *.yaml */
+  uint16_t batt_perc; /**< CAN signal 'batt_perc' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for battery_vt
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -122,6 +143,9 @@ struct battery_vt {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for battery_vt using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"voltage", voltage},
@@ -131,16 +155,27 @@ struct battery_vt {
     };
   }
 
+  /**
+   * @brief   Get the message name: battery_vt
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "battery_vt";
   }
 };
+/**
+ * @brief   Storage class for battery_info CAN message
+ */
 struct battery_info {
-  uint8_t fan1;
-  uint8_t fan2;
-  uint16_t max_cell_v;
-  uint16_t min_cell_v;
+  uint8_t fan1; /**< CAN signal 'fan1' defined in *.yaml */
+  uint8_t fan2; /**< CAN signal 'fan2' defined in *.yaml */
+  uint16_t max_cell_v; /**< CAN signal 'max_cell_v' defined in *.yaml */
+  uint16_t min_cell_v; /**< CAN signal 'min_cell_v' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for battery_info
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -176,6 +211,9 @@ struct battery_info {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for battery_info using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"fan1", fan1},
@@ -185,17 +223,28 @@ struct battery_info {
     };
   }
 
+  /**
+   * @brief   Get the message name: battery_info
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "battery_info";
   }
 };
+/**
+ * @brief   Storage class for afe1_status CAN message
+ */
 struct afe1_status {
-  uint8_t id;
-  uint8_t temp;
-  uint16_t v1;
-  uint16_t v2;
-  uint16_t v3;
+  uint8_t id; /**< CAN signal 'id' defined in *.yaml */
+  uint8_t temp; /**< CAN signal 'temp' defined in *.yaml */
+  uint16_t v1; /**< CAN signal 'v1' defined in *.yaml */
+  uint16_t v2; /**< CAN signal 'v2' defined in *.yaml */
+  uint16_t v3; /**< CAN signal 'v3' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for AFE1_status
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -239,6 +288,9 @@ struct afe1_status {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for AFE1_status using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"id", id},
@@ -249,17 +301,28 @@ struct afe1_status {
     };
   }
 
+  /**
+   * @brief   Get the message name: AFE1_status
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "AFE1_status";
   }
 };
+/**
+ * @brief   Storage class for afe2_status CAN message
+ */
 struct afe2_status {
-  uint8_t id;
-  uint8_t temp;
-  uint16_t v1;
-  uint16_t v2;
-  uint16_t v3;
+  uint8_t id; /**< CAN signal 'id' defined in *.yaml */
+  uint8_t temp; /**< CAN signal 'temp' defined in *.yaml */
+  uint16_t v1; /**< CAN signal 'v1' defined in *.yaml */
+  uint16_t v2; /**< CAN signal 'v2' defined in *.yaml */
+  uint16_t v3; /**< CAN signal 'v3' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for AFE2_status
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -303,6 +366,9 @@ struct afe2_status {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for AFE2_status using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"id", id},
@@ -313,17 +379,28 @@ struct afe2_status {
     };
   }
 
+  /**
+   * @brief   Get the message name: AFE2_status
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "AFE2_status";
   }
 };
+/**
+ * @brief   Storage class for afe3_status CAN message
+ */
 struct afe3_status {
-  uint8_t id;
-  uint8_t temp;
-  uint16_t v1;
-  uint16_t v2;
-  uint16_t v3;
+  uint8_t id; /**< CAN signal 'id' defined in *.yaml */
+  uint8_t temp; /**< CAN signal 'temp' defined in *.yaml */
+  uint16_t v1; /**< CAN signal 'v1' defined in *.yaml */
+  uint16_t v2; /**< CAN signal 'v2' defined in *.yaml */
+  uint16_t v3; /**< CAN signal 'v3' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for AFE3_status
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -367,6 +444,9 @@ struct afe3_status {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for AFE3_status using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"id", id},
@@ -377,14 +457,25 @@ struct afe3_status {
     };
   }
 
+  /**
+   * @brief   Get the message name: AFE3_status
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "AFE3_status";
   }
 };
+/**
+ * @brief   Storage class for fast_one_shot_msg CAN message
+ */
 struct fast_one_shot_msg {
-  uint16_t sig1;
-  uint16_t sig2;
+  uint16_t sig1; /**< CAN signal 'sig1' defined in *.yaml */
+  uint16_t sig2; /**< CAN signal 'sig2' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for fast_one_shot_msg
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -406,6 +497,9 @@ struct fast_one_shot_msg {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for fast_one_shot_msg using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"sig1", sig1},
@@ -413,14 +507,25 @@ struct fast_one_shot_msg {
     };
   }
 
+  /**
+   * @brief   Get the message name: fast_one_shot_msg
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "fast_one_shot_msg";
   }
 };
+/**
+ * @brief   Storage class for medium_one_shot_msg CAN message
+ */
 struct medium_one_shot_msg {
-  uint16_t sig1;
-  uint16_t sig2;
+  uint16_t sig1; /**< CAN signal 'sig1' defined in *.yaml */
+  uint16_t sig2; /**< CAN signal 'sig2' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for medium_one_shot_msg
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -442,6 +547,9 @@ struct medium_one_shot_msg {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for medium_one_shot_msg using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"sig1", sig1},
@@ -449,14 +557,25 @@ struct medium_one_shot_msg {
     };
   }
 
+  /**
+   * @brief   Get the message name: medium_one_shot_msg
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "medium_one_shot_msg";
   }
 };
+/**
+ * @brief   Storage class for slow_one_shot_msg CAN message
+ */
 struct slow_one_shot_msg {
-  uint16_t sig1;
-  uint16_t sig2;
+  uint16_t sig1; /**< CAN signal 'sig1' defined in *.yaml */
+  uint16_t sig2; /**< CAN signal 'sig2' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for slow_one_shot_msg
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -478,6 +597,9 @@ struct slow_one_shot_msg {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for slow_one_shot_msg using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"sig1", sig1},
@@ -485,14 +607,25 @@ struct slow_one_shot_msg {
     };
   }
 
+  /**
+   * @brief   Get the message name: slow_one_shot_msg
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "slow_one_shot_msg";
   }
 };
+/**
+ * @brief   Storage class for cc_pedal CAN message
+ */
 struct cc_pedal {
-  uint32_t throttle_output;
-  uint8_t brake_output;
+  uint32_t throttle_output; /**< CAN signal 'throttle_output' defined in *.yaml */
+  uint8_t brake_output; /**< CAN signal 'brake_output' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for cc_pedal
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -515,6 +648,9 @@ struct cc_pedal {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for cc_pedal using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"throttle_output", throttle_output},
@@ -522,17 +658,28 @@ struct cc_pedal {
     };
   }
 
+  /**
+   * @brief   Get the message name: cc_pedal
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "cc_pedal";
   }
 };
+/**
+ * @brief   Storage class for cc_info CAN message
+ */
 struct cc_info {
-  uint32_t target_velocity;
-  uint8_t drive_state;
-  uint8_t cruise_control;
-  uint8_t regen_braking;
-  uint8_t hazard_enabled;
+  uint32_t target_velocity; /**< CAN signal 'target_velocity' defined in *.yaml */
+  uint8_t drive_state; /**< CAN signal 'drive_state' defined in *.yaml */
+  uint8_t cruise_control; /**< CAN signal 'cruise_control' defined in *.yaml */
+  uint8_t regen_braking; /**< CAN signal 'regen_braking' defined in *.yaml */
+  uint8_t hazard_enabled; /**< CAN signal 'hazard_enabled' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for cc_info
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -576,6 +723,9 @@ struct cc_info {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for cc_info using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"target_velocity", target_velocity},
@@ -586,14 +736,25 @@ struct cc_info {
     };
   }
 
+  /**
+   * @brief   Get the message name: cc_info
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "cc_info";
   }
 };
+/**
+ * @brief   Storage class for cc_steering CAN message
+ */
 struct cc_steering {
-  uint8_t input_cc;
-  uint8_t input_lights;
+  uint8_t input_cc; /**< CAN signal 'input_cc' defined in *.yaml */
+  uint8_t input_lights; /**< CAN signal 'input_lights' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for cc_steering
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -613,6 +774,9 @@ struct cc_steering {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for cc_steering using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"input_cc", input_cc},
@@ -620,13 +784,24 @@ struct cc_steering {
     };
   }
 
+  /**
+   * @brief   Get the message name: cc_steering
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "cc_steering";
   }
 };
+/**
+ * @brief   Storage class for cc_regen_percentage CAN message
+ */
 struct cc_regen_percentage {
-  uint32_t percent;
+  uint32_t percent; /**< CAN signal 'percent' defined in *.yaml */
 
+  /**
+   * @brief   Decode new CAN data and update the storage for cc_regen_percentage
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -642,96 +817,110 @@ struct cc_regen_percentage {
     }
   }
 
+  /**
+   * @brief   Create a JSON object for cc_regen_percentage using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {"percent", percent}
     };
   }
 
+  /**
+   * @brief   Get the message name: cc_regen_percentage
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "cc_regen_percentage";
   }
 };
 
+/**
+ * @brief   Main CAN message Handler
+ * @details This function shall dynamically allocate a struct based on the CAN ID
+ *          This function shall decode the data, then update the CAN Cache 'm_canInfo' with JSON data
+ * @param   id Can message ID
+ * @param   data Pointer to the CAN message data
+ */
 void CanListener::canMessageHandler(uint32_t id, const uint8_t* data) {
   switch (id) {
     case SYSTEM_CAN_MESSAGE_BMS_CARRIER_BATTERY_STATUS: {
-        battery_status *message = new battery_status();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      battery_status *message = new battery_status();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_BMS_CARRIER_BATTERY_VT: {
-        battery_vt *message = new battery_vt();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      battery_vt *message = new battery_vt();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_BMS_CARRIER_BATTERY_INFO: {
-        battery_info *message = new battery_info();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      battery_info *message = new battery_info();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_BMS_CARRIER_AFE1_STATUS: {
-        afe1_status *message = new afe1_status();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      afe1_status *message = new afe1_status();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_BMS_CARRIER_AFE2_STATUS: {
-        afe2_status *message = new afe2_status();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      afe2_status *message = new afe2_status();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_BMS_CARRIER_AFE3_STATUS: {
-        afe3_status *message = new afe3_status();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      afe3_status *message = new afe3_status();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_CAN_COMMUNICATION_FAST_ONE_SHOT_MSG: {
-        fast_one_shot_msg *message = new fast_one_shot_msg();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      fast_one_shot_msg *message = new fast_one_shot_msg();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_CAN_COMMUNICATION_MEDIUM_ONE_SHOT_MSG: {
-        medium_one_shot_msg *message = new medium_one_shot_msg();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      medium_one_shot_msg *message = new medium_one_shot_msg();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_CAN_COMMUNICATION_SLOW_ONE_SHOT_MSG: {
-        slow_one_shot_msg *message = new slow_one_shot_msg();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      slow_one_shot_msg *message = new slow_one_shot_msg();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_CENTRE_CONSOLE_CC_PEDAL: {
-        cc_pedal *message = new cc_pedal();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      cc_pedal *message = new cc_pedal();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_CENTRE_CONSOLE_CC_INFO: {
-        cc_info *message = new cc_info();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      cc_info *message = new cc_info();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_CENTRE_CONSOLE_CC_STEERING: {
-        cc_steering *message = new cc_steering();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      cc_steering *message = new cc_steering();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     case SYSTEM_CAN_MESSAGE_CENTRE_CONSOLE_CC_REGEN_PERCENTAGE: {
-        cc_regen_percentage *message = new cc_regen_percentage();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      cc_regen_percentage *message = new cc_regen_percentage();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
     default: {
       std::cout << "Unknown message ID: " << static_cast<int>(id) << std::endl;

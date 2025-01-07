@@ -8,9 +8,10 @@
  ************************************************************************************************/
 
 /* Standard library Headers */
-#include <iostream>
 #include <string.h>
+
 #include <cstring>
+#include <iostream>
 
 /* Inter-component Headers */
 #include <unistd.h>

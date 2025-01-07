@@ -1,6 +1,19 @@
-#include "command_code.h"
+/************************************************************************************************
+ * @file   command_code.cc
+ *
+ * @brief  Source file defining the CommandCode helpers
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <iostream>
+
+/* Inter-component Headers */
+
+/* Intra-component Headers */
+#include "command_code.h"
 
 std::string encodeCommand(const CommandCode commandCode, std::string &message) {
   return std::to_string(static_cast<uint8_t>(commandCode)) + '|' + message;

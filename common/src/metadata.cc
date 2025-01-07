@@ -1,9 +1,21 @@
-#include "metadata.h"
+/************************************************************************************************
+ * @file   metadata.cc
+ *
+ * @brief  Source file defining the Metadata class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <cstring>
 #include <vector>
 
+/* Inter-component Headers */
+
+/* Intra-component Headers */
 #include "command_code.h"
+#include "metadata.h"
 #include "serialization.h"
 
 namespace Datagram {

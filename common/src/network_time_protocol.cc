@@ -1,9 +1,21 @@
-#include "network_time_protocol.h"
+/************************************************************************************************
+ * @file   network_time_protocol.cc
+ *
+ * @brief  Source file defining the Network time protocol helpers
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
-#include <arpa/inet.h>
-
+/* Standard library Headers */
 #include <cstring>
 #include <iostream>
+
+/* Inter-component Headers */
+#include <arpa/inet.h>
+
+/* Intra-component Headers */
+#include "network_time_protocol.h"
 
 time_t ntpToUnixTime(uint32_t ntpTime) {
   return ntpTime - NTP_UNIX_EPOCH_DIFF;

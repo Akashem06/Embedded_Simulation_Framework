@@ -25,11 +25,18 @@
 
 {% set messages = messages | list -%}
 {%- for message in messages %}
+/**
+ * @brief   Storage class for {{ message.name | lower }} CAN message
+ */
 struct {{ message.name | lower }} {
   {%- for signal in message.signals %}
-  uint{{ signal.length }}_t {{ signal.name }};
+  uint{{ signal.length }}_t {{ signal.name }}; /**< CAN signal '{{ signal.name }}' defined in *.yaml */
   {%- endfor %}
 
+  /**
+   * @brief   Decode new CAN data and update the storage for {{ message.name }}
+   * @param   data Pointer to the CAN message to be decoded
+   */
   void decode(const uint8_t *data) {
     uint64_t raw_val = 0U;
     uint8_t start_byte = 0U;
@@ -45,6 +52,9 @@ struct {{ message.name | lower }} {
     {%- endfor %}
   }
 
+  /**
+   * @brief   Create a JSON object for {{ message.name }} using the storage
+   */
   nlohmann::json to_json() const {
     return {
       {%- for signal in message.signals %}
@@ -53,6 +63,10 @@ struct {{ message.name | lower }} {
     };
   }
 
+  /**
+   * @brief   Get the message name: {{ message.name }}
+   * @return  Returns the message name
+   */
   std::string get_message_name() const {
     return "{{ message.name }}";
   }
@@ -61,14 +75,21 @@ struct {{ message.name | lower }} {
 
 {%- endfor %}
 
+/**
+ * @brief   Main CAN message Handler
+ * @details This function shall dynamically allocate a struct based on the CAN ID
+ *          This function shall decode the data, then update the CAN Cache 'm_canInfo' with JSON data
+ * @param   id Can message ID
+ * @param   data Pointer to the CAN message data
+ */
 void CanListener::canMessageHandler(uint32_t id, const uint8_t* data) {
   switch (id) {
   {%- for message in messages %}
     case SYSTEM_CAN_MESSAGE_{{message.sender | upper}}_{{message.name | upper}}: {
-        {{ message.name | lower }} *message = new {{ message.name | lower }}();
-        message->decode(data);
-        m_canInfo[message->get_message_name()] = message->to_json();
-        break;
+      {{ message.name | lower }} *message = new {{ message.name | lower }}();
+      message->decode(data);
+      m_canInfo[message->get_message_name()] = message->to_json();
+      break;
     }
   {%- endfor %}
     default: {

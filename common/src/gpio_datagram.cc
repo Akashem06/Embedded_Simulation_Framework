@@ -1,9 +1,21 @@
-#include "gpio_datagram.h"
+/************************************************************************************************
+ * @file   gpio_datagram.cc
+ *
+ * @brief  Source file defining the GpioDatagram class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <cstring>
 #include <iostream>
 #include <vector>
 
+/* Inter-component Headers */
+
+/* Intra-component Headers */
+#include "gpio_datagram.h"
 #include "serialization.h"
 
 namespace Datagram {

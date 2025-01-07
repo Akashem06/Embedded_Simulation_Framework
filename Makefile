@@ -36,7 +36,7 @@ CAN_SRC_DIR 			= $(CAN_DIR)/src
 CAN_INC_DIR 			= $(CAN_DIR)/inc
 
 # Source files
-COMMON_SRCS := $(wildcard $(COMMON_DIR)/src/*.cpp)
+COMMON_SRCS := $(wildcard $(COMMON_DIR)/src/*.cc)
 SERVER_APP_SRCS := $(wildcard $(SERVER_DIR)/app/src/*.cc)
 SERVER_UTILS_SRCS := $(wildcard $(SERVER_DIR)/utils/src/*.cc)
 CLIENT_APP_SRCS := $(wildcard $(CLIENT_DIR)/app/src/*.cc)
@@ -45,7 +45,7 @@ DRIVERS_SRCS := $(wildcard $(DRIVERS_DIR)/src/*.c)
 CAN_SRCS := $(wildcard $(CAN_DIR)/src/*.c)
 
 # Object files
-COMMON_OBJS := $(patsubst $(COMMON_DIR)/src/%.cpp,$(BUILD_DIR)/common/%.o,$(COMMON_SRCS))
+COMMON_OBJS := $(patsubst $(COMMON_DIR)/src/%.cc,$(BUILD_DIR)/common/%.o,$(COMMON_SRCS))
 SERVER_APP_OBJS := $(patsubst $(SERVER_DIR)/app/src/%.cc,$(BUILD_DIR)/server/app/%.o,$(SERVER_APP_SRCS))
 SERVER_UTILS_OBJS := $(patsubst $(SERVER_DIR)/utils/src/%.cc,$(BUILD_DIR)/server/utils/%.o,$(SERVER_UTILS_SRCS))
 CLIENT_APP_OBJS := $(patsubst $(CLIENT_DIR)/app/src/%.cc,$(BUILD_DIR)/client/app/%.o,$(CLIENT_APP_SRCS))
@@ -92,7 +92,7 @@ server: autogen_sim_server_files $(BUILD_DIR)/$(SERVER_TARGET)
 
 client: $(BUILD_DIR)/$(CLIENT_TARGET)
 
-$(BUILD_DIR)/common/%.o: $(COMMON_SRC_DIR)/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/common/%.o: $(COMMON_SRC_DIR)/%.cc | $(BUILD_DIR)
 	@echo "Compiling $<"
 	$(CPP) $(CPPFLAGS) -I$(COMMON_INC_DIR) -I$(SERVER_APP_INC_DIR) -I$(SERVER_UTILS_INC_DIR) -I$(CLIENT_APP_INC_DIR) -I$(CLIENT_UTILS_INC_DIR) -c $< -o $@
 
@@ -137,7 +137,7 @@ init_vcan:
 
 format:
 	@echo "Formatting source files..."
-	@find . -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i -style=file {} +
+	@find . -type f \( -name "*.cc" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i -style=file {} +
 
 clean:
 	@echo "Cleaning build directory..."

@@ -1,9 +1,21 @@
-#include "i2c_datagram.h"
+/************************************************************************************************
+ * @file   i2c_datagram.cc
+ *
+ * @brief  Source file defining the I2CDatagram class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <cstring>
-#include <sstream>
+#include <iostream>
 #include <vector>
 
+/* Inter-component Headers */
+
+/* Intra-component Headers */
+#include "i2c_datagram.h"
 #include "serialization.h"
 
 namespace Datagram {
@@ -26,7 +38,7 @@ void I2C::deserialize(std::string &i2cDatagramPayload) {
   m_i2cDatagram.i2cPort = static_cast<Port>(deserializeInteger<uint8_t>(i2cDatagramPayload, offset));
   m_i2cDatagram.bufferLength = deserializeInteger<uint16_t>(i2cDatagramPayload, offset);
 
-  if (m_i2cDatagram.bufferLength > MAX_BUFFER_SIZE) {
+  if (m_i2cDatagram.bufferLength > I2C_MAX_BUFFER_SIZE) {
     throw std::runtime_error("Deserialized I2C buffer length exceeds maximum allowed size");
   }
 
@@ -43,7 +55,7 @@ void I2C::setBuffer(const uint8_t *data, size_t length) {
 }
 
 void I2C::clearBuffer() {
-  std::memset(m_i2cDatagram.buffer, 0U, MAX_BUFFER_SIZE);
+  std::memset(m_i2cDatagram.buffer, 0U, I2C_MAX_BUFFER_SIZE);
 }
 
 I2C::Port I2C::getI2CPort() const {

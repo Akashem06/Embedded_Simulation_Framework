@@ -1,5 +1,4 @@
-#ifndef QUEUES_H
-#define QUEUES_H
+#pragma once
 
 /************************************************************************************************
  * @file   queues.h
@@ -122,5 +121,3 @@ uint32_t queue_get_spaces_available(Queue *queue);
 #endif
 
 /** @} */
-
-#endif

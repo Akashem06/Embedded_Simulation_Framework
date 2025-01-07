@@ -14,12 +14,12 @@
 /* Inter-component Headers */
 #include <unistd.h>
 
-#include "thread_helpers.h"
 #include "system_can.h"
+#include "thread_helpers.h"
 
 /* Intra-component Headers */
-#include "can_listener.h"
 #include "app.h"
+#include "can_listener.h"
 
 #define CAN_MESSAGE_JSON_KEY "messages"
 

@@ -1,7 +1,20 @@
-#include "json_manager.h"
+/************************************************************************************************
+ * @file   json_manager.cc
+ *
+ * @brief  Source file defining the JSONManager class
+ *
+ * @date   2025-01-04
+ * @author Aryan Kashem
+ ************************************************************************************************/
 
+/* Standard library Headers */
 #include <chrono>
 #include <ctime>
+
+/* Inter-component Headers */
+
+/* Intra-component Headers */
+#include "json_manager.h"
 
 void JSONManager::createDefaultProjectJSON(const std::string &projectName) {
   if (projectExists(projectName)) {

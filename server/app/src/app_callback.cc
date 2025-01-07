@@ -36,8 +36,7 @@ void applicationMessageCallback(Server *server, ClientConnection *client, std::s
         server->updateClientName(client, clientMetadata.getProjectName());
       }
 
-      serverJSONManager.setProjectValue(client->getClientName(), "project_name",
-                                        client->getClientName()); /* Get the updated name if there are duplicates */
+      serverJSONManager.setProjectValue(client->getClientName(), "project_name", client->getClientName()); /* Get the updated name if there are duplicates */
       serverJSONManager.setProjectValue(client->getClientName(), "project_status", clientMetadata.getProjectStatus());
       serverJSONManager.setProjectValue(client->getClientName(), "hardware_model", clientMetadata.getHardwareModel());
       break;
