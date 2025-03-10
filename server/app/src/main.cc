@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   Server Server;
   Terminal applicationTerminal(&Server);
 
-  Server.listenClients(1024, applicationMessageCallback, applicationConnectCallback);
+  Server.listenClients(8080, applicationMessageCallback, applicationConnectCallback);
 
   serverCanListener.listenCanBus();
 

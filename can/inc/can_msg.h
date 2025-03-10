@@ -1,5 +1,4 @@
-#ifndef CAN_MSG_H
-#define CAN_MSG_H
+#pragma once
 
 /************************************************************************************************
  * @file   can_msg.h
@@ -66,5 +65,3 @@ typedef struct CanMessage {
 } CanMessage;
 
 /** @} */
-
-#endif

@@ -67,6 +67,7 @@ help:
 	@echo "  client   		 	- Build only the client"
 	@echo "  clean    		 	- Remove build directory"
 	@echo "  format   		 	- Format source files using clang-format"
+	@echo "  lint				- Lint the source files using CPPLINT"
 	@echo "  doxygen   		 	- Generate an HTML documentation website"
 	@echo ""
 	@echo "Configuration:"
@@ -139,6 +140,9 @@ format:
 	@echo "Formatting source files..."
 	@find . -type f \( -name "*.cc" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i -style=file {} +
 
+lint:
+	cpplint --quiet --recursive .
+
 clean:
 	@echo "Cleaning build directory..."
 	@rm -rf $(BUILD_DIR)
@@ -148,4 +152,4 @@ doxygen:
 	@doxygen doxygen/Doxyfile
 	@echo "Documentation generated"
 
-.PHONY: all clean server client format init_vcan doxygen
+.PHONY: all clean server client format lint init_vcan doxygen
